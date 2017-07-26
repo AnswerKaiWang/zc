@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mapper.UserSecondPicMapper" >
+	<resultMap type="UserSecondPicVO" id="fileMap">
+		<id property="id" column="id"/>
+		<result property="custId" column="cust_id"/>
+		<result property="custName" column="custName"/>
+		<result property="cardTypeId" column="card_type_id"/>
+		<result property="picName" column="pic_name"/>
+		<result property="picCreateTime" column="pic_create_time"/>
+		<result property="remark" column="remark"/>
+		<result property="picPath" column="ppath"/>
+		<result property="picYouxiaoqi" column="pic_youxiaoqi"/>
+		<collection property="files" ofType="UserSecondPicPathVo" notNullColumn="pid">
+			<id property="id" column="pid"/>
+			<result property="picPath" column="pic_path"/>
+		</collection>
+	</resultMap>
+	<select id="findById" resultMap="fileMap">
+		select 
+		p.id id,
+		p.cust_id,
+		concat(s.name,'-',s.user_no) custName,
+		p.card_type_id,
+		p.pic_name,
+		p.pic_youxiaoqi,
+		p.pic_create_time,
+		p.pic_path ppath,
+		p.remark,
+		ps.id pid,
+		ps.pic_path 
+		FROM user_second_pic p 
+		INNER JOIN user_second s ON p.cust_id = s.id 
+		LEFT JOIN user_second_pics ps ON ps.pic_id = p.id 
+		WHERE p.id = #{id}
+	</select> 
+	
+	
+	<select id="findByCustId" resultMap="fileMap">
+		select 
+		p.id id,
+		p.cust_id,
+		concat(s.name,'-',s.user_no) custName,
+		p.card_type_id,
+		p.pic_name,
+		p.pic_youxiaoqi,
+		p.pic_create_time,
+		p.remark,
+		ps.id pid,
+		ps.pic_path 
+		FROM user_second_pic p 
+		INNER JOIN user_second s ON p.cust_id = s.id 
+		LEFT JOIN user_second_pics ps ON ps.pic_id = p.id 
+		WHERE p.cust_id = #{id}
+	</select>
+	
+	<update id="updatePic" parameterType="UserSecondPic">
+		UPDATE user_second_pic SET pic_name = #{picName},remark=#{remark},
+		pic_youxiaoqi=#{picYouxiaoqi},pic_path=#{picPath},update_time = CURRENT_TIMESTAMP  
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="delPicsByPid">
+		DELETE FROM user_second_pics WHERE pic_id = #{id}
+	</delete>
+</mapper>

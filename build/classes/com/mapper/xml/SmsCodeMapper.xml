@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mapper.SmsCodeMapper" >
+  <resultMap id="sms_code_map" type="SmsCode" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="user_id" property="userId" jdbcType="BIGINT" />
+    <result column="to_number" property="toNumber" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="sms_type" property="smsType" jdbcType="TINYINT" />
+    <result column="use_status" property="useStatus" jdbcType="TINYINT" />
+    <result column="company_id" property="companyId" jdbcType="BIGINT" />
+  </resultMap>
+  <sql id="sms_code_list_sql" >
+    id, create_time, update_time, user_id, to_number, code, sms_type, use_status, 
+    company_id
+  </sql>
+  <select id="getByBo" resultMap="sms_code_map">
+  	select
+  	<include refid="sms_code_list_sql"></include>
+  	from 
+  	sms_code
+  	<where>
+  		<if test="bo.userId!=null">
+  			and user_id=#{bo.userId}
+  		</if>
+  		<if test="bo.toNumber!=null">
+  			and to_number=#{bo.toNumber}
+  		</if>
+  		<if test="bo.smsType!=null">
+  			and sms_type=#{bo.smsType}
+  		</if>
+  		<if test="bo.useStatus!=null">
+  			and use_status=#{bo.useStatus}
+  		</if>
+  		<if test="bo.createTime!=null">
+  			and create_time &gt;=#{bo.createTime}
+  		</if>
+  	</where>
+  	order by create_time desc
+  </select>
+  <update id="updateStatusByBo">
+  	update
+  	sms_code
+  	<set>
+  		use_status=2
+  	</set>
+  	<where>
+  		<if test="bo.userId!=null">
+  			and user_id=#{bo.userId}
+  		</if>
+  		<if test="bo.smsType!=null">
+  			and sms_type=#{bo.smsType}
+  		</if>
+  	</where>
+  </update>
+  
+  
+</mapper>

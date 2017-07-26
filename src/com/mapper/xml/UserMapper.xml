@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mapper.UserMapper" >
+	
+	<resultMap id="user_base_map" type="User" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="user_no" property="userNo" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="tradePassword" property="tradepassword" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="VARCHAR" />
+    <result column="card_type" property="cardType" jdbcType="VARCHAR" />
+    <result column="card_no" property="cardNo" jdbcType="VARCHAR" />
+    <result column="zip" property="zip" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="tel" property="tel" jdbcType="VARCHAR" />
+    <result column="sex" property="sex" jdbcType="BIT" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="company_id" property="companyId"/>
+     <result column="last_login_time" property="lastLoginTime"/>
+  </resultMap>
+  <resultMap type="UserVo" id="user_base_list_map" extends="user_base_map">
+  	<result column="company_name" property="companyName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="user_base_sql" >
+    id, create_time, update_time, user_no, phone, password, tradePassword, name, status, 
+    type, card_type, card_no, zip, address, tel, sex, email,company_id,last_login_time
+  </sql>
+  
+  <select id="getList" resultMap="user_base_list_map">
+		select 
+		u.id, u.create_time, u.update_time, u.user_no, u.phone,  u.name, u.status, 
+    	u.type, u.card_type, u.card_no, u.zip, u.address, u.tel, u.sex, u.email,
+		u.company_id,u.last_login_time,c.name company_name
+		from user u
+		left join company c on u.company_id=c.id
+		<where>
+			<if test="bo.userNo!=null">
+			and  u.user_no like CONCAT('%',#{bo.userNo},'%')
+			</if>
+			<if test="bo.phone!=null">
+			and  u.phone like CONCAT('%',#{bo.phone},'%')
+			</if>
+			<if test="bo.name!=null">
+			and u.name like CONCAT('%',#{bo.name},'%')
+			</if>
+			<if test="bo.type!=null">
+			and u.type=#{bo.type}
+			</if>
+			<if test="bo.cardType!=null">
+			and u.card_type=#{bo.cardType}
+			</if>
+			<if test="bo.cardNo!=null">
+			and u.card_no like CONCAT('%',#{bo.cardNo},'%')
+			</if>
+			<if test="bo.startTime!=null">
+			and u.create_time>=#{bo.startTime}
+			</if>
+			<if test="bo.endTime!=null">
+			and u.create_time &lt; #{bo.endTime}
+			</if>
+			<if test="bo.status!=null">
+			and u.status=#{bo.status}
+			</if>
+			<if test="bo.sex!=null">
+			and u.sex=#{bo.sex}
+			</if>
+			<if test="bo.companyId!=null">
+			and u.company_id=#{bo.companyId}
+			</if>
+	      </where> 
+	      <if test="pager.sort!=null">
+            order by u.${pager.sort} ${pager.order}
+        </if>
+	</select>
+	
+	<select id="getLastestMaxNo" resultType="string" parameterType="string">
+		select user_no from user_second where user_type = #{userType} AND 
+		<if test="userType =='geren'">
+			user_no like CONCAT('','P','%')
+		</if>
+		<if test="userType == 'qiye'">
+			user_no like CONCAT('','E','%')
+		</if>
+		ORDER BY user_no DESC LIMIT 0,1
+	</select>
+</mapper>

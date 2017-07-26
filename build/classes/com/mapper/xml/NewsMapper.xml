@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mapper.NewsMapper">
+	<select id="getList" resultType="News">
+		SELECT
+		id,
+		title,
+		create_time createTime,
+		update_time updateTime,
+		content,
+		source,
+		publish_time publishTime,
+		cover,
+		brief 
+		FROM news 
+		<if test="pager.sort!=null and pager.sort=='create_time'">
+			order by ${pager.sort} ${pager.order}
+		</if>
+	</select>
+	
+	
+	<!-- cura -->
+	<select id="curaBannerList" resultType="NewsVo">
+		SELECT
+		id,
+		title,
+		source,
+		DATE_FORMAT(publish_time,'%Y-%m-%d') publishTime,
+		cover,
+		brief 
+		FROM news 
+		ORDER BY publish_time DESC
+	</select>
+	
+	<select id="curaList" resultType="NewsVo">
+		SELECT
+		id,
+		title,
+		source,
+		DATE_FORMAT(publish_time,'%Y-%m-%d')  publishTime,
+		cover,
+		brief 
+		FROM news 
+		WHERE 
+		<if test="mf == 0 ">
+			DATE_FORMAT(publish_time,'%Y') = #{year} 
+		</if>
+		<if test="mf == 1">
+			DATE_FORMAT(publish_time,'%Y') &lt;= #{year} 
+		</if>
+		<if test="keyword != null">
+			AND ( title like concat('%',#{keyword},'%') OR brief like concat('%',#{keyword},'%'))
+		</if>
+		ORDER BY publish_time DESC 
+		LIMIT #{start},#{pageSize}
+	</select>
+	
+	<select id="curaCount" resultType="int">
+		SELECT
+		count(1)  
+		FROM news 
+		WHERE 
+		<if test="mf == 0 ">
+			DATE_FORMAT(publish_time,'%Y') = #{year} 
+		</if>
+		<if test="mf == 1">
+			DATE_FORMAT(publish_time,'%Y') &lt;= #{year} 
+		</if>
+		<if test="keyword != null">
+			AND ( title like concat('%',#{keyword},'%') OR brief like concat('%',#{keyword},'%'))
+		</if>
+	</select>
+	
+	<select id="curaReferList" resultType="NewsVo">
+		SELECT
+		id,
+		title,
+		DATE_FORMAT(publish_time,'%Y-%m-%d') publishTime 
+		FROM news 
+		WHERE reference =1 
+		ORDER BY publish_time DESC  
+	</select>
+</mapper>

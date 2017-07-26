@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mapper.LectureMapper">
+	<select id="getList" resultType="Lecture">
+		SELECT
+		t.id,
+		t.create_time createTime,
+		t.title,
+		t.brief,
+		t.cover,
+		t.rec_status recStatus,
+		t.lastest_time lastestTime   
+		FROM lecture t
+		<where>
+		</where>
+		<if test="pager.sort!=null and pager.sort=='create_time'">
+			order by t.${pager.sort} ${pager.order}
+		</if>
+	</select>
+	
+	<delete id="delLecVedios">
+		DELETE FROM lecture_vedio WHERE lecture_id = #{id}
+	</delete>
+	
+	
+	<select id="curaList" parameterType="LecturePageBo" resultType="LectureWebVo">
+		SELECT
+		t.id,
+		t.title,
+		t.brief,
+		t.cover  
+		FROM lecture t
+		<where>
+			<if test="keyword != null ">
+				AND t.title like concat('%',#{keyword},'%')
+			</if>
+		</where>
+		LIMIT #{start},#{pageSize}
+	</select>
+	
+	
+	<select id="curaRecList" resultType="LectureWebVo">
+		SELECT 
+			l.id,
+			l.title,
+			l.brief,
+			l.cover,
+			COUNT(lv.id) fileNum 
+		FROM lecture l 
+		LEFT JOIN lecture_vedio lv ON l.id = lv.lecture_id 
+		WHERE l.rec_status = 1 
+		GROUP BY l.id 
+		ORDER BY l.create_time DESC 
+		LIMIT 0,10
+	</select>
+	
+	<select id="curaCount" parameterType="LecturePageBo" resultType="int">
+		SELECT count(1) FROM lecture t 
+		<where>
+			<if test="keyword != null ">
+				AND t.title like concat('%',#{keyword},'%')
+			</if>
+		</where>
+	</select>
+	
+	<resultMap type="LectureEditVo" id="LectureEditVoMap">
+		<id column="id" property="id"/>
+		<result column="title" property="title"/>
+		<result column="brief" property="brief"/>
+		<result column="cover" property="cover"/>
+		<result column="lastestTime" property="lastestTime"/>
+		<collection property="vedios" ofType="LectureVedioEditVo" notNullColumn="lid">
+			<id column="lid" property="id"/>
+			<result column="lname" property="name"/>
+			<result column="path" property="path"/>
+		</collection>
+	</resultMap>
+	<select id="findDetailById" resultMap="LectureEditVoMap">
+		SELECT 
+			l.id,
+			l.title,
+			l.brief,
+			l.cover,
+			l.lastest_time lastestTime,
+			lv.id lid,
+			lv.`name` lname,
+			lv.path,
+			lv.play_num playNum,
+			lv.favor_num favorNum,
+			lv.share_num shareNum,
+			lv.create_time createTime   
+		FROM lecture l 
+		LEFT JOIN lecture_vedio lv ON l.id = lv.lecture_id 
+		WHERE l.id = #{id}
+	</select>
+	
+	
+	<resultMap type="LectureWebDetailVo" id="LectureWebDetailVoMap">
+		<id column="id" property="id"/>
+		<result column="title" property="title"/>
+		<result column="brief" property="brief"/>
+		<result column="cover" property="cover"/>
+		<result column="lastestTime" property="lastestTime"/>
+		<collection property="vedios" ofType="LectureVedioVo" notNullColumn="lid">
+			<id column="lid" property="id"/>
+			<result column="lname" property="name"/>
+			<result column="path" property="path"/>
+			<result column="playNum" property="playNum"/>
+			<result column="favorNum" property="favorNum"/>
+			<result column="shareNum" property="shareNum"/>
+			<result column="createTime" property="createTime"/>
+		</collection>
+	</resultMap>
+	<select id="findWebDetailById" resultMap="LectureWebDetailVoMap">
+		SELECT 
+			l.id,
+			l.title,
+			l.brief,
+			l.cover,
+			l.lastest_time lastestTime,
+			lv.id lid,
+			lv.`name` lname,
+			lv.path,
+			lv.play_num playNum,
+			lv.favor_num favorNum,
+			lv.share_num shareNum,
+			lv.create_time createTime   
+		FROM lecture l 
+		LEFT JOIN lecture_vedio lv ON l.id = lv.lecture_id 
+		WHERE l.id = #{id}
+	</select>
+</mapper>

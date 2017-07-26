@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mapper.UserSecondMapper" >
+  <resultMap id="userSecond_map" type="UserSecond" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="user_type" property="userType" jdbcType="VARCHAR" />
+    <result column="user_no" property="userNo" jdbcType="VARCHAR" />
+    <result column="member_id" property="memberId" jdbcType="BIGINT" />
+    <result column="welcome_code" property="welcomeCode" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="user_level_id" property="userLevelId" jdbcType="BIGINT" />
+    <result column="info_source_id" property="infoSourceId" jdbcType="BIGINT" />
+    <result column="customer_source_id" property="customerSourceId" jdbcType="BIGINT" />
+    <result column="note" property="note" jdbcType="VARCHAR" />
+    <result column="inner_note" property="innerNote" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="userSecond_per_list_map" type="UserSecondPerVo" extends="userSecond_map">
+  	<result column="per_name" property="perName" jdbcType="VARCHAR" />
+    <result column="per_sex" property="perSex" jdbcType="BIT" />
+    <result column="per_card_type_id" property="perCardTypeId" jdbcType="BIGINT" />
+    <result column="per_card_no" property="perCardNo" jdbcType="VARCHAR" />
+    <result column="per_qixian" property="perQixian" jdbcType="VARCHAR" />
+    <result column="per_jiguan" property="perJiguan" jdbcType="VARCHAR" />
+    <result column="per_phone" property="perPhone" jdbcType="VARCHAR" />
+    <result column="per_tel" property="perTel" jdbcType="VARCHAR" />
+    <result column="per_email" property="perEmail" jdbcType="VARCHAR" />
+    <result column="per_city_id" property="perCityId" jdbcType="BIGINT" />
+    <result column="per_addr" property="perAddr" jdbcType="VARCHAR" />
+    <result column="per_birthday" property="perBirthday" jdbcType="TIMESTAMP" />
+    <result column="per_country_id" property="perCountryId" jdbcType="BIGINT" />
+    <result column="ziran_per" property="ziranPer" jdbcType="VARCHAR" />
+    <result column="shouyi_per" property="shouyiPer" jdbcType="VARCHAR" />
+    <result column="per_zhiye_id" property="perZhiyeId" jdbcType="BIGINT" />
+    <result column="per_hangye_id" property="perHangyeId" jdbcType="BIGINT" />
+    <result column="per_xueli_id" property="perXueliId" jdbcType="BIGINT" />
+    <result column="gongzuo_company" property="gongzuoCompany" jdbcType="VARCHAR" />
+    <result column="gongzuo_zhiwei" property="gongzuoZhiwei" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="userSecond_com_list_map" type="UserSecondComVo" extends="userSecond_map">
+  	<result column="sale_round" property="saleRound" jdbcType="VARCHAR" />
+    <result column="zhizhao" property="zhizhao" jdbcType="VARCHAR" />
+    <result column="qixian" property="qixian" jdbcType="VARCHAR" />
+    <result column="daima" property="daima" jdbcType="VARCHAR" />
+    <result column="shuiwu" property="shuiwu" jdbcType="VARCHAR" />
+    <result column="kaihu" property="kaihu" jdbcType="VARCHAR" />
+    <result column="xinyong" property="xinyong" jdbcType="VARCHAR" />
+    <result column="com_phone" property="comPhone" jdbcType="VARCHAR" />
+    <result column="com_zip" property="comZip" jdbcType="VARCHAR" />
+    <result column="com_addr" property="comAddr" jdbcType="VARCHAR" />
+    <result column="real_controller_name" property="realControllerName" jdbcType="VARCHAR" />
+    <result column="real_addr" property="realAddr" jdbcType="VARCHAR" />
+    <result column="fa_name" property="faName" jdbcType="VARCHAR" />
+    <result column="fa_card_type_id" property="faCardTypeId" jdbcType="BIGINT" />
+    <result column="fa_card_no" property="faCardNo" jdbcType="VARCHAR" />
+    <result column="fa_qixian" property="faQixian" jdbcType="VARCHAR" />
+    <result column="fa_sex" property="faSex" jdbcType="BIT" />
+  </resultMap>
+  <sql id="userSecond_sql" >
+    s.id,s.user_type,s.user_no,s.member_id,s.welcome_code,s.name,s.user_level_id,s.info_source_id,
+    s.customer_source_id,s.note,s.inner_note,s.status,s.create_time,s.update_time
+  </sql>
+  
+  <select id="getPerList" resultMap="userSecond_per_list_map">
+		select 
+		<include refid="userSecond_sql" />
+		,sp.per_name,sp.per_sex,sp.per_card_type_id,sp.per_card_no,sp.per_qixian,sp.per_jiguan,sp.per_phone,
+		sp.per_tel,sp.per_email,sp.per_city_id,sp.per_addr,sp.per_birthday,sp.per_country_id,sp.ziran_per,sp.
+    shouyi_per,sp.per_zhiye_id,sp.per_hangye_id,sp.per_xueli_id,sp.gongzuo_company,sp.gongzuo_zhiwei
+		from user_second s
+		left join user_second_per  sp on s.id=sp.id
+		<where>
+			<if test="bo.userType!=null">
+			and s.user_type = #{bo.userType}
+			</if>
+			<if test="bo.userNo!=null">
+			and s.user_no like CONCAT('%',#{bo.userNo},'%')
+			</if>
+			<if test="bo.memberId!=null">
+			and s.member_id =#{bo.memberId}
+			</if>
+			<if test="bo.name!=null">
+			and s.name like CONCAT('%',#{bo.name},'%')
+			</if>
+			<if test="bo.status!=null">
+			and s.status = #{bo.status}
+			</if>
+			<if test="bo.infoSourceId!=null">
+			and s.info_source_id = #{bo.infoSourceId}
+			</if>
+			<if test="bo.userLevelId!=null">
+			and s.user_level_id = #{bo.userLevelId}
+			</if>
+			<if test="bo.perCardTypeId!=null">
+			and sp.per_card_type_id = #{bo.perCardTypeId}
+			</if>
+			<if test="bo.perCardNo!=null">
+			and sp.per_card_no = #{bo.perCardNo}
+			</if>
+			<if test="bo.perPhone!=null">
+			and sp.per_phone like CONCAT('%',#{bo.perPhone},'%')
+			</if>
+			<if test="bo.startTime!=null">
+			and s.create_time>=#{bo.startTime}
+			</if>
+			<if test="bo.endTime!=null">
+			and s.create_time &lt; #{bo.endTime}
+			</if>
+	      </where> 
+	      <if test="pager.sort!=null">
+            order by s.${pager.sort} ${pager.order}
+        </if>
+	</select>
+	
+	<select id="getComList" resultMap="userSecond_com_list_map">
+		select 
+		<include refid="userSecond_sql" />
+		,sp.sale_round,sp.zhizhao,sp.qixian,sp.daima,sp.shuiwu,sp.kaihu,sp.xinyong,sp.com_phone,sp.com_zip,
+		sp.com_addr,sp.real_controller_name,sp.real_addr,sp.fa_name,sp.fa_card_type_id,sp.fa_card_no,sp.fa_qixian,sp.fa_sex
+		from user_second s
+		left join user_second_com  sp on s.id=sp.id
+		<where>
+			<if test="bo.userType!=null">
+				and s.user_type = #{bo.userType}
+			</if>
+			<if test="bo.userNo!=null">
+				and s.user_no like CONCAT('%',#{bo.userNo},'%')
+			</if>
+			<if test="bo.memberId!=null">
+				and s.member_id =#{bo.memberId}
+			</if>
+			<if test="bo.name!=null">
+				and s.name like CONCAT('%',#{bo.name},'%')
+			</if>
+			<if test="bo.status!=null">
+				and s.status = #{bo.status}
+			</if>
+			<if test="bo.infoSourceId!=null">
+				and s.info_source_id = #{bo.infoSourceId}
+			</if>
+			<if test="bo.faCardNo!=null">
+				and sp.fa_card_no = #{bo.faCardNo}
+			</if>
+			<if test="bo.faName!=null">
+			and sp.fa_name like CONCAT('%',#{bo.faName},'%')
+			</if>
+			<if test="bo.comAddr!=null">
+			and sp.com_addr like CONCAT('%',#{bo.comAddr},'%')
+			</if>
+			<if test="bo.startTime!=null">
+			and s.create_time>=#{bo.startTime}
+			</if>
+			<if test="bo.endTime!=null">
+			and s.create_time &lt; #{bo.endTime}
+			</if>
+	      </where> 
+	      <if test="pager.sort!=null">
+            order by s.${pager.sort} ${pager.order}
+        </if>
+	</select>
+	
+	<select id="getLastestMaxNo" resultType="string" parameterType="string">
+		select user_no from user_second where user_type = #{userType} AND 
+		<if test="userType =='geren'">
+			user_no like CONCAT('','P','%')
+		</if>
+		<if test="userType == 'qiye'">
+			user_no like CONCAT('','E','%')
+		</if>
+		ORDER BY user_no DESC LIMIT 0,1
+	</select>
+	
+	
+	<select id="searchCustList" resultType="SelectResultVo">
+		select 
+		 id,
+		 CONCAT(name,'-',user_no) name 
+		 FROM user_second 
+		 <if test="keyword !='' and null != keyword">
+			 WHERE name like CONCAT('',#{keyword},'%') 
+		 </if>
+		 LIMIT 0,20 
+	</select>
+	
+	<select id="findUserSecondPer" resultType="LoginVo">
+		SELECT 
+		us.id userSecondId,
+		us.name,
+		us.password,
+		us.user_risk_level_id riskLevel,
+		us.user_evaluate_time evaluationTime,
+		d.name level,
+		us.user_type userType,
+		us.user_type type,
+		usp.per_card_no cardNo,
+		usp.per_sex gender,
+		us.user_no custNo,
+		usp.per_phone phone,
+		us.member_id consultId,
+		m.real_name consultName,
+		m.phone consultPhone,
+		usp.per_zip zip,
+		usp.per_email email,
+		usp.per_zhiye_id jobId,
+		usp.per_country_id countryId,
+		usp.per_hangye_id industryId,
+		usp.gongzuo_company company,
+		usp.gongzuo_zhiwei duty,
+		usp.per_xueli_id education,
+		usp.per_tel tel,
+		usp.per_addr addr,
+		us.welcome_code welcomeCode,
+		usp.per_card_type_id cardTypeId,
+		usp.per_qixian qixian,
+		usp.per_jiguan jiguan,
+		usp.per_birthday birth,
+		usp.per_city_id cityId,
+		usa.year_income_id income,
+		usa.can_touru canInvestAmount,
+		usc.con_name trusterName,
+		usc.con_phone trusterPhone 
+		FROM user_second us 
+		INNER JOIN user_second_per usp ON us.id = usp.id 
+		LEFT JOIN member m ON us.member_id = m.id 
+		LEFT JOIN dictionary d ON us.user_level_id = d.id 
+		LEFT JOIN user_second_attr usa ON us.id = usa.id 
+		LEFT JOIN user_second_contant usc ON us.id = usc.id 
+		WHERE usp.per_phone =#{bo.userName} OR usp.per_card_no = #{bo.userName} LIMIT 0,1
+	</select>
+	<select id="findUserSecondCom" resultType="LoginVo">
+		SELECT 
+		us.id userSecondId,
+		us.name,
+		us.password,
+		d.name level,
+		us.user_risk_level_id riskLevel,
+		us.user_evaluate_time evaluationTime,
+		us.user_type userType,
+		us.user_type type,
+		usc.zhizhao cardNo,
+		usc.com_phone phone,
+		us.welcome_code welcomeCode,
+		2 gender,
+		us.user_no custNo,
+		us.member_id consultId,
+		m.real_name consultName,
+		m.phone consultPhone,
+		usc.com_addr addr,
+		usc.com_zip zip,
+		usc.daima comCode,
+		usc.shuiwu,
+		usc.kaihu,
+		usc.xinyong,
+		usc.com_tel tel,
+		usc.com_email email,
+		usc.com_city_id cityId      
+		FROM user_second us 
+		INNER JOIN user_second_com usc ON us.id = usc.id 
+		LEFT JOIN member m ON us.member_id = m.id 
+		LEFT JOIN dictionary d ON us.user_level_id = d.id 
+		LEFT JOIN dictionary dr ON us.user_level_id = dr.id 
+		WHERE usc.com_phone =#{bo.userName} OR usc.zhizhao = #{bo.userName} LIMIT 0,1
+	</select>
+	<!-- 获得用户风险等级 -->
+	<select id="getRiskBear" resultType="string">
+		SELECT rb.risk_bear FROM fund_risk_evaluation re
+		INNER JOIN fund_risk_bear rb ON re.id = rb.risk_id 
+		WHERE risk_level=#{riskLevel} LIMIT 0,1
+	</select>
+	
+	<select id="getCardNoCount" resultType="int">
+		SELECT count(1) FROM user_second_per WHERE per_card_no =#{cardNo} 
+		UNION ALL 
+		SELECT count(1) FROM user_second_com WHERE zhizhao = #{cardNo}
+	</select>
+	<select id="getCardNoCountExclude" resultType="int">
+		SELECT count(1) FROM user_second_per WHERE per_card_no =#{cardNo} AND id != #{userSecondId} 
+		UNION ALL 
+		SELECT count(1) FROM user_second_com WHERE zhizhao = #{cardNo} AND id != #{userSecondId}
+	</select>
+	
+	<select id="getExistPerPhone" resultType="int">
+		select count(1) from user_second_per where per_phone = #{phone} AND id != #{id}
+	</select>
+	<select id="getExistComPhone" resultType="int">
+		select count(1) from user_second_com where com_phone = #{phone} AND id != #{id}
+	</select>
+	
+	<!-- 客户证件即将到期 -->
+	<select id="getExpriedList" resultType="ExpireVo">
+		SELECT t.* FROM (SELECT usp.pic_name name,us.`name` owner,usp.pic_youxiaoqi expDate,TO_DAYS(usp.pic_youxiaoqi)-TO_DAYS(CURDATE()) ds   
+		FROM user_second_pic usp 
+		INNER JOIN user_second us ON usp.cust_id = us.id 
+		WHERE usp.pic_youxiaoqi IS NOT NULL) t WHERE t.ds >0 AND t.ds &lt;= #{expireDays} ORDER BY t.expDate
+	</select>
+	<!-- 风险测评即将到期提醒 -->
+	<select id="getRiskExpriedList" resultType="ExpireVo">
+		SELECT t.* FROM (SELECT 
+		us.id, 
+		us.name owner,
+		qr.eval_time,DATE_ADD(qr.eval_time,INTERVAL 3 YEAR) expDate,
+		TO_DAYS(DATE_ADD(qr.eval_time,INTERVAL 3 YEAR))-TO_DAYS(CURDATE()) ds   
+		FROM question_user_record qr 
+		INNER JOIN user_second us ON qr.user_second_id = us.id 
+		WHERE qr.eval_time IS NOT NULL 
+		AND qr.eval_time = (SELECT MAX(eval_time) FROM question_user_record WHERE user_second_id = qr.user_second_id) 
+		GROUP BY qr.user_second_id) t WHERE t.ds >0 AND t.ds &lt;= #{expireDays} ORDER BY t.expDate
+	</select>
+	
+	<select id="getFundRecordExpriedList">
+		SELECT t.* FROM (SELECT fr.name, fr.end_time expDate,f.name owner,TO_DAYS(fr.end_time)-TO_DAYS(CURDATE()) ds  
+		FROM fund_record fr 
+		INNER JOIN fund f ON fr.fund_id = f.id 
+		WHERE fr.end_time IS NOT null) t WHERE t.ds >0 AND t.ds &lt;= #{expireDays} AND t.expDate
+	</select>
+	
+	<!-- 重置密码 -->
+	<update id="resetPwd">
+		UPDATE user_second SET password = #{password} WHERE id = #{id}
+	</update>
+	<update id="resetPerPhone">
+		UPDATE user_second_per SET per_phone = #{phone} WHERE id = #{id}
+	</update>
+	<update id="resetPerEmail">
+		UPDATE user_second_per SET per_email = #{email} WHERE id = #{id}
+	</update>
+	<update id="resetComPhone">
+		UPDATE user_second_com SET com_phone = #{phone} WHERE id = #{id}
+	</update>
+	<update id="resetComEmail">
+		UPDATE user_second_com SET com_email = #{email} WHERE id = #{id}
+	</update>
+</mapper>

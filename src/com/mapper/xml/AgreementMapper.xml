@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mapper.AgreementMapper" >
+  <select id="getList" resultType="AgreementVo">
+		SELECT 
+		t.id,
+		f.manager,
+		m.name managerName,
+		t.fund_id fundId,
+		f.name fundName,
+		f.setup_time startTime,
+		f.cash_time endTime,
+		t.user_second_id userSecondId,
+		us.name custName,
+		IF(ISNULL(usc.zhizhao),usp.per_card_no,usc.zhizhao) custNo ,
+		t.ano,
+		t.astatus 
+		FROM agreement t 
+		INNER JOIN user_second us ON t.user_second_id = us.id  
+		INNER JOIN fund f ON t.fund_id = f.id 
+		LEFT JOIN user_second_com usc ON us.id = usc.id 
+		LEFT JOIN user_second_per usp ON us.id = usp.id 
+		LEFT JOIN company m ON f.company_id = m.id 
+		<where> 
+			<if test="bo.fundId != null">
+				and  t.fund_id = #{bo.fundId}
+			</if>
+			<if test="bo.userSecondId != null">
+				and  t.user_second_id = #{bo.userSecondId}
+			</if>
+			<if test="bo.custNo != null">
+				and  (
+					usc.zhizhao like concat('',#{bo.custNo},'%') 
+					OR 
+					usp.per_card_no like concat('',#{bo.custNo},'%') 
+				)
+			</if>
+			<if test="bo.ano!=null">
+				and t.ano like concat('',#{bo.ano},'%') 
+			</if>
+			<if test="bo.startTime!=null">
+				and f.setup_time>=#{bo.startTime}
+			</if>
+			<if test="bo.endTime!=null">
+				and f.setup_time &lt; #{bo.endTime}
+			</if>
+			<if test="bo.memberId!=null">
+				f.manager = #{bo.memberId}
+			</if>
+	      </where> 
+	      <if test="pager.sort!=null and pager.sort=='create_time'">
+            order by t.${pager.sort} ${pager.order}
+          </if>
+	</select>
+	
+	
+	<resultMap id="detailMap" type="AgreementVo" >
+     	<id column="id" property="id"/>
+	    <result column="fundId" property="fundId" />
+	    <result column="fundName" property="fundName" />
+	    <result column="userSecondId" property="userSecondId" />
+	    <result column="custName" property="custName" />
+	    <result column="ano" property="ano" />
+	    <result column="astatus" property="astatus" />
+	    <result column="remark" property="remark" />
+	    <collection property="files" ofType="AgreementFile" notNullColumn="rid">
+	    	<id column="rid" property="id"/>
+		    <result column="name" property="name" />
+		    <result column="file_path" property="filePath" />
+	    </collection>
+  </resultMap>
+	<select id="findDetailById" resultMap="detailMap">
+		SELECT 
+		t.id,
+		t.fund_id fundId,
+		f.name fundName,
+		t.user_second_id userSecondId,
+		us.name custName,
+		t.ano,
+		t.astatus,
+		t.remark,
+		af.id rid,
+		af.name, 
+		af.file_path   
+		FROM agreement t 
+		INNER JOIN user_second us ON t.user_second_id = t.user_second_id 
+		INNER JOIN fund f ON t.fund_id = f.id 
+		LEFT JOIN agreement_file af ON t.id = af.aid 
+		WHERE  t.id = #{id}
+	</select>
+</mapper>

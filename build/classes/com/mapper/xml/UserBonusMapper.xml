@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mapper.UserBonusMapper" >
+  <resultMap id="user_bonus_map" type="UserBonus" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <id column="ok_time" property="okTime" jdbcType="TIMESTAMP" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="type" property="type" jdbcType="VARCHAR" />
+    <result column="dengji_time" property="dengjiTime" jdbcType="TIMESTAMP" />
+    <result column="send_time" property="sendTime" jdbcType="TIMESTAMP" />
+    <result column="share" property="share" jdbcType="BIGINT" />
+    <result column="one_money" property="oneMoney" jdbcType="BIGINT" />
+    <result column="total_money" property="totalMoney" jdbcType="BIGINT" />
+    <result column="real_money" property="realMoney" jdbcType="BIGINT" />
+    <result column="user_id" property="userId" jdbcType="BIGINT" />
+    <result column="fund_id" property="fundId" jdbcType="BIGINT" />
+    <result column="company_id" property="companyId" jdbcType="BIGINT" />
+  </resultMap>
+  <sql id="user_bouns_sql" >
+    ub.id, ub.ok_time, ub.create_time, ub.update_time, ub.type, ub.dengji_time, ub.send_time, ub.share, ub.one_money, 
+    ub.total_money, ub.real_money, ub.user_id, ub.fund_id, ub.company_id
+  </sql>
+ <resultMap id="user_bonus_list_map" type="UserBonusVo" extends="user_bonus_map">
+  	<result column="fund_name" property="fundName" />
+  	<result column="name" property="name"  />
+  	<result column="phone" property="phone"  />
+  	<result column="card_no" property="cardNo"  />
+  	<result column="no" property="no"  />
+  	<result column="userNo" property="userNo"  />
+  </resultMap>
+  
+   <select id="getList" resultMap="user_bonus_list_map">
+		select 
+		<include refid="user_bouns_sql" />
+		,u.phone phone,
+		u.name name,
+		u.user_no userNo,
+		u.card_no card_no,
+		f.no no,
+		f.name fundName
+		from user_bonus ub
+		left join  user u on ub.user_id=u.id
+		left join  fund f on ub.fund_id=f.id
+		<where>
+			<if test="bo.startTime!=null">
+			and ub.ok_time>=#{bo.startTime}
+			</if>
+			<if test="bo.endTime!=null">
+			and ub.ok_time &lt; #{bo.endTime}
+			</if>
+			<if test="bo.dengjiSatrtTime!=null">
+			and ub.dengji_time>=#{bo.dengjiSatrtTime}
+			</if>
+			<if test="bo.dengjiEndTime!=null">
+			and ub.dengji_time &lt; #{bo.dengjiEndTime}
+			</if>
+			<if test="bo.sendSatrtTime!=null">
+			and ub.send_time>=#{bo.sendSatrtTime}
+			</if>
+			<if test="bo.sendEndTime!=null">
+			and ub.send_time &lt; #{bo.sendEndTime}
+			</if>
+			<if test="bo.companyId!=null">
+			and ub.company_id=#{bo.companyId}
+			</if>
+			<if test="bo.type!=null">
+			and ub.type=#{bo.type}
+			</if>
+			<if test="bo.userNo!=null">
+			and  u.user_no like CONCAT('%',#{bo.userNo},'%')
+			</if>
+			<if test="bo.name!=null">
+			and  u.name like CONCAT('%',#{bo.name},'%')
+			</if>
+			<if test="bo.phone!=null">
+			and  u.phone like CONCAT('%',#{bo.phone},'%')
+			</if>
+			<if test="bo.cardNo!=null">
+			and  u.card_no like CONCAT('%',#{bo.cardNo},'%')
+			</if>
+			<if test="bo.fundId!=null">
+			and f.fund_id=#{bo.fundId}
+			</if>
+			<if test="bo.fundName!=null">
+			and f.name like CONCAT('%',#{bo.fundName},'%')
+			</if>
+	      </where> 
+          <if test="pager.sort!=null">
+            order by ub.${pager.sort} ${pager.order}
+          </if>
+	</select>
+	
+	 <select id="getUserBonus" resultMap="user_bonus_list_map">
+		select 
+		<include refid="user_bouns_sql" />
+		,f.no no,
+		f.name fundName
+		from user_bonus ub
+		left join  fund f on ub.fund_id=f.id
+		<where>
+		<if test="bo.companyId!=null">
+			and f.company_id=#{bo.companyId}
+		</if>
+		<if test="bo.userId!=null">
+			and ub.user_id=#{bo.userId}
+		</if>
+		<if test="bo.startTime!=null">
+			and ub.ok_time>=#{bo.startTime}
+		</if>
+		<if test="bo.endTime!=null">
+			and ub.ok_time &lt;=#{bo.endTime}
+		</if>
+		<if test="bo.name!=null">
+			and f.name like CONCAT('%',#{bo.name},'%')
+		</if>
+		<if test="bo.fundStatus!=null">
+			and f.status in
+			<foreach collection="bo.fundStatus" open="(" close=")" item="ff" separator=",">
+			#{ff}
+			</foreach>
+		</if>
+		</where>
+		order by ub.ok_time desc
+	</select>
+	<!-- 分红查询 -->
+	<select id="getCuraList" resultMap="user_bonus_list_map">
+		select 
+		<include refid="user_bouns_sql" />
+		,u.phone phone,
+		u.name name,
+		u.user_no userNo,
+		u.card_no card_no,
+		f.no no,
+		f.name fundName
+		from user_bonus ub
+		left join  user u on ub.user_id=u.id
+		left join  fund f on ub.fund_id=f.id
+		<where>
+			<if test="bo.type != null and bo.type != 0">
+				and  f.type = #{bo.type}
+			</if>
+			<if test="bo.lawWay != null and bo.lawWay != 0">
+				and  f.law_way = #{bo.lawWay}
+			</if>
+			<if test="bo.duration !=null and bo.duration != 0">
+				and f.duration=#{bo.duration}
+			</if>
+			<if test="bo.cardNo!=null">
+			and  u.card_no like CONCAT('%',#{bo.cardNo},'%')
+			</if>
+			<if test="bo.fundId!=null">
+			and f.id=#{bo.fundId}
+			</if>
+	      </where> 
+	</select>
+</mapper>

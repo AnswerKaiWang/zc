@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mapper.MessageMapper" >
+  <select id="getList" resultType="Message">
+		SELECT 
+		t.id,
+		t.from_uid fromUid,
+		t.to_uid toUid,
+		t.content,
+		t.create_time createTime,
+		t.readed   
+		FROM message t 
+	      <if test="pager.sort!=null and pager.sort=='create_time'">
+            order by t.${pager.sort} ${pager.order}
+          </if>
+	</select>
+	<!-- 发消息的选择用户 -->
+	<select id="findMessageUsers" resultType="MessageUserVo">
+		SELECT 
+		us.id,
+		us.name,
+		us.user_type userType,
+		us.member_id memberId,
+		m.real_name memberName,
+		us.user_level_id userLevelId,
+		IF(ISNULL(usp.per_card_type_id),'0',usp.per_card_type_id) cardType,
+		IF(ISNULL(usc.zhizhao),usp.per_card_no,usc.zhizhao) cardNo,
+		IF(ISNULL(usc.com_phone),usp.per_phone,usc.com_phone) phone  
+		 FROM user_second us 
+		LEFT JOIN user_second_per usp ON us.id = usp.id 
+		LEFT JOIN user_second_com usc ON us.id = usc.id 
+		LEFT JOIN member m ON us.member_id = m.id  
+		<where>
+			<if test="bo.name != null and bo.name != ''">
+				AND us.name like concat('%',${bo.name},'%')
+			</if>
+			<if test="bo.userType != null">
+				AND us.user_type = ${bo.userType}
+			</if>
+			<if test="bo.memberId != null">
+				AND us.member_id =${bo.memberId}
+			</if>
+			<if test="bo.userLevel != null">
+				AND us.user_level_id =${bo.userLevel}
+			</if>
+			<if test="bo.cardNo != null and bo.cardNo !='' ">
+				AND (
+					usc.zhizhao like concat('%',${bo.cardNo},'%') 
+					OR 
+					usp.per_card_no like concat('%',${bo.cardNo},'%')
+				)
+			</if>
+			<if test="bo.phone != null and bo.phone !='' ">
+				AND (
+					usc.com_phone like concat('%',${bo.phone},'%') 
+					OR 
+					usp.per_phone like concat('%',${bo.phone},'%')
+				)
+			</if>
+			<if test="bo.fundId != null">
+				AND EXISTS (SELECT 1 FROM user_apply WHERE user_second_id = us.id AND fund_id = #{bo.fundId} )
+			</if>
+		</where>
+		GROUP BY us.id 
+		<if test="pager.sort!=null and pager.sort=='create_time'">
+            order by us.${pager.sort} ${pager.order}
+          </if>
+	</select>
+	
+	<select id="curaMessageList" resultType="Message">
+		select 
+		t.id,
+		t.from_uid fromUid,
+		t.to_uid toUid,
+		t.content,
+		t.create_time createTime,
+		t.readed    
+		from message t
+		WHERE t.to_uid = #{toUid} 
+		 	ORDER BY t.create_time DESC 
+		 	LIMIT #{start}, #{pageSize}
+	</select>
+	
+	
+	<select id="getUnreadCount" resultType="int">
+		select 
+		count(1)     
+		from message t
+		WHERE t.readed=0 AND t.to_uid = #{toUid} 
+	</select>
+</mapper>

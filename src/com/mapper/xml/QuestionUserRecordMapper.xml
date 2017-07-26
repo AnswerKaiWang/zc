@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mapper.QuestionUserRecordMapper">
+	<resultMap id="BaseResultMap" type="QuestionUserVo">
+		<id column="id" property="id"/>
+		<result column="create_time" property="createTime"/>
+		<result column="update_time" property="updateTime"/>
+		<result column="score" property="score"/>
+		<result column="user_second_id" property="userSecondId" />
+		<result column="name" property="custName"/>
+	</resultMap>
+	<select id="getList" resultMap="BaseResultMap">
+		select 
+		q.id, 
+		q.user_second_id,
+		u.name,
+		q.create_time, 
+		q.update_time,
+		q.score 
+		FROM question_user_record q
+		INNER JOIN user_second u ON q.user_second_id = u.id 
+		<where>
+			<if test="bo.userSecondId!=null">
+				and q.user_second_id =#{bo.userSecondId}
+			</if>
+		</where>
+		<if test="pager.sort!=null">
+			order by q.${pager.sort} ${pager.order}
+		</if>
+	</select>
+	
+	<select id="findDetailById">
+		
+	</select>
+	
+	<select id="getEvaluationScore" resultType="int">
+		SELECT SUM(IFNULL(q.score,0))
+		FROM question_user_answer qa  
+		INNER JOIN question_answer q ON q.question_id = qa.question_id AND q.id = qa.question_answer_id 
+		WHERE qa.qu_id = #{quId}
+	</select>
+	
+	<select id="getEvaluationResult" resultType="RiskEvaluationResultVo">
+		SELECT 
+		b.risk_bear riskBear,
+		e.risk_level riskLevel,
+		e.suit_investor suitInvestor,
+		b.risk_notification riskNotification  
+		FROM fund_risk_bear b INNER JOIN fund_risk_evaluation e ON e.id = b.risk_id 
+		WHERE b.score_min &lt;= #{score} AND b.score_max >=#{score}
+	</select>
+</mapper>

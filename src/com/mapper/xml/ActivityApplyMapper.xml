@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mapper.ActivityApplyMapper">
+	<select id="getList" resultType="ActivityApply">
+		SELECT
+		t.id,
+		t.create_time createTime,
+		t.activity_id activityId,
+		a.title actName,
+		t.name,
+		t.phone,
+		t.member_num memberNum   
+		FROM activity_apply t 
+		INNER JOIN activity a ON a.id = t.activity_id 
+		<where>
+		</where>
+		<if test="pager.sort!=null and pager.sort=='create_time'">
+			order by t.${pager.sort} ${pager.order}
+		</if>
+	</select>
+</mapper>

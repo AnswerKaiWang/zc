@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mapper.FundMapper" >
+	<resultMap id="fun_base_map" type="Fund" >
+     <id column="id" property="id"/>
+    <result column="create_time" property="createTime" />
+    <result column="update_time" property="updateTime" />
+    <result column="name" property="name"/>
+    <result column="series_name" property="seriesName"/>
+    <result column="no" property="no"/>
+    <result column="bei_no" property="beiNo"/>
+    <result column="type" property="type"/>
+    <result column="fund_status" property="fundStatus"/>
+    <result column="size" property="size"  />
+    <result column="setup_time" property="setupTime" />
+    <result column="duration" property="duration"/>
+    <result column="page_index" property="pageIndex"/>
+    <result column="company_id" property="companyId"/>
+    <result column="show_status" property="showStatus"  />
+    <result column="front_status" property="frontStatus"  />
+    <result column="deadline" property="deadline"  />
+  </resultMap>
+   <sql id="fun_base_sql" >
+    id, create_time, update_time,series_name, name, no, bei_no, type, fund_status, size, setup_time, duration, 
+    page_index,show_status,company_id,front_status,deadline   
+  </sql>
+	<select id="getList" resultMap="fun_base_map">
+		select 
+		<include refid="fun_base_sql" />
+		from fund 
+		<where>
+			<if test="bo.name!=null">
+			and name like CONCAT('%',#{bo.name},'%')
+			</if>
+			<if test="bo.no!=null">
+			and  no like CONCAT('%',#{bo.no},'%')
+			</if>
+			<if test="bo.bei!=null">
+			and bei_no like CONCAT('%',#{bo.bei},'%')
+			</if>
+			<if test="bo.startTime!=null">
+			and setup_time>=#{bo.startTime}
+			</if>
+			<if test="bo.endTime!=null">
+			and setup_time &lt; #{bo.endTime}
+			</if>
+			<if test="bo.status!=null">
+			and fund_status=#{bo.status}
+			</if>
+			<if test="bo.type!=null">
+			and type=#{bo.type}
+			</if>
+			<if test="bo.companyId!=null">
+			and company_id=#{bo.companyId}
+			</if>
+	      </where> 
+	      <if test="pager.sort!=null">
+            order by ${pager.sort} ${pager.order}
+        </if>
+	</select>
+	<select id="getFrontList" resultMap="fun_base_map">
+		select 
+		f.id, f.create_time, f.update_time, f.name, f.no, f.bei_no, f.type, f.fund_status, f.size, f.setup_time, f.duration, 
+    f.page_index,f.show_status,f.company_id
+		from fund as f
+		inner join user_share  as us 
+		<where>
+			f.id=fund_id
+			and us.user_id=#{bo.userId}
+			and f.company_id=#{bo.companyId}
+			and f.show_status=0
+	      </where> 
+	      	group by f.id 
+            order by page_index desc,create_time desc
+	</select>
+	<select id="getTypeByGroup" resultType="String">
+	select
+	type
+	from fund 
+	group by type
+	</select>
+	
+	<sql id="cols">
+		f.id,
+		f.company_id,
+		f.no,
+		f.series_name,
+		f.name,
+		f.type,
+		f.law_way,
+		f.risk_level,
+		f.fund_status,
+		f.show_status,
+		f.bei_no,
+		f.manager,
+		f.truster,
+		f.size,
+		f.start_com_money,
+		f.start_per_money,
+		f.incr_money,
+		f.deadline,
+		f.store_period,
+		f.duration,
+		f.setup_time,
+		f.cash_time,
+		f.collect_start_time,
+		f.collect_end_time,
+		f.buy_start_time,
+		f.buy_end_time,
+		f.fund_manager,
+		f.gp_fund,
+		f.plan_collect_money,
+		f.trust_info,
+		f.trust_no,
+		f.page_index,
+		f.fund_intro,
+		f.fund_detail,
+		f.fund_nature,
+		f.fund_strategy,
+		f.front_status,
+		f.cover   
+	</sql>
+	<resultMap id="detailMap" type="FundEditVo" >
+     	<id column="id" property="id"/>
+	    <result column="company_id" property="companyId" />
+	    <result column="no" property="no" />
+	    <result column="series_name" property="seriesName" />
+	    <result column="name" property="name" />
+	    <result column="type" property="type" />
+	    <result column="law_way" property="lawWay" />
+	    <result column="risk_level" property="riskLevel" />
+	    <result column="fund_status" property="fundStatus" />
+	    <result column="show_status" property="showStatus" />
+	    <result column="bei_no" property="beiNo" />
+	    <result column="manager" property="manager" />
+	    <result column="truster" property="truster" />
+	    <result column="size" property="size" />
+	    <result column="start_com_money" property="startComMoney" />
+	    <result column="start_per_money" property="startPerMoney" />
+	    <result column="incr_money" property="incrMoney" />
+	    <result column="deadline" property="deadline" />
+	    <result column="store_period" property="storePeriod" />
+	    <result column="duration" property="duration" />
+	    <result column="setup_time" property="setupTime" />
+	    <result column="cash_time" property="cashTime" />
+	    <result column="collect_start_time" property="collectStartTime" />
+	    <result column="collect_end_time" property="collectEndTime" />
+	    <result column="buy_start_time" property="buyStartTime" />
+	    <result column="buy_end_time" property="buyEndTime" />
+	    <result column="fund_manager" property="fundManager" />
+	    <result column="gp_fund" property="gpFund" />
+	    <result column="plan_collect_money" property="planCollectMoney" />
+	    <result column="trust_info" property="trustInfo" />
+	    <result column="trust_no" property="trustNo" />
+	    <result column="page_index" property="pageIndex" />
+	    <result column="fund_intro" property="fundIntro" />
+	    <result column="fund_detail" property="fundDetail" />
+	    <result column="fund_nature" property="fundNature" />
+	    <result column="fund_strategy" property="fundStrategy" />
+	    <result column="front_status" property="frontStatus" />
+	    <result column="cover" property="cover" />
+	    <collection property="records" ofType="FundRecord" notNullColumn="rid">
+	    	<id column="rid" property="id"/>
+		    <result column="rname" property="name" />
+		    <result column="rstartTime" property="startTime" />
+		    <result column="rendTime" property="endTime" />
+		    <result column="rstoreDays" property="storeDays" />
+		    <result column="rtotalMoney" property="totalMoney" />
+		    <result column="remark" property="remark" />
+	    </collection>
+  </resultMap>
+	<select id="findDetailById" resultMap="detailMap">
+		select
+		<include refid="cols"/>
+		,
+		r.id rid,
+		r.name rname,
+		r.start_time rstartTime,
+		r.end_time rendTime,
+		r.store_days rstoreDays,
+		r.total_money rtotalMoney,
+		r.remark 
+		 from fund f 
+		 LEFT JOIN fund_record r ON f.id = r.fund_id 
+		 WHERE f.id = #{id}
+	</select>
+	<!-- 产品-募集期产品bannerlist -->
+	<select id="curaBannerList" resultType="ProductVo">
+		select 
+		 f.id fundId,
+		 f.series_name title,
+		 f.deadline,
+		 f.fund_status fundStatus,
+		 f.risk_level riskLevel,
+		 f.cover    
+		 FROM fund f 
+		 WHERE f.front_status =1 
+		 ORDER BY f.create_time DESC
+	</select>
+	
+	<!-- 产品列表：募集期的产品 -->
+	<select id="cruaList" resultType="ProductVo">
+		 SELECT t.* FROM (
+		 select 
+		 f.id fundId,
+		 f.series_name title,
+		 f.deadline,
+		 f.fund_status fundStatus,
+		 f.fund_nature fundNature,
+		 f.risk_level riskLevel,
+		 COUNT(ua.id) buyed,
+		 f.create_time 
+		 from fund f 
+		 LEFT JOIN user_apply ua ON f.id = ua.fund_id AND ua.user_second_id = #{bo.userSecondId} 
+		 WHERE f.show_status =1 
+		  <if test="bo.productName != null">
+		 	AND f.series_name like concat('%',#{bo.productName},'%') 
+		 </if>
+		 <if test="bo.seriesName != null">
+		 	AND f.series_name = #{bo.seriesName} 
+		 </if>
+		 <if test="bo.fundType != null and bo.fundType != 0">
+		 	AND f.type = #{bo.fundType} 
+		 </if>
+		 <if test="bo.deadline != null and bo.deadline != 0">
+		 	AND f.duration = #{bo.deadline} 
+		 </if>
+		 GROUP BY f.id 
+		 ) t  
+		 ORDER BY t.create_time DESC 
+		 LIMIT #{bo.start}, #{bo.pageSize}
+	</select>
+	
+	<select id="cruaCount" resultType="int">
+		 SELECT count(1) FROM (
+		 select 
+		 f.id fundId 
+		 from fund f 
+		 LEFT JOIN user_apply ua ON f.id = ua.fund_id AND ua.user_second_id = #{bo.userSecondId} 
+		 WHERE f.show_status =1 
+		  <if test="bo.productName != null">
+		 	AND f.series_name like concat('%',#{bo.productName},'%') 
+		 </if>
+		 <if test="bo.seriesName != null">
+		 	AND f.series_name = #{bo.seriesName} 
+		 </if>
+		 <if test="bo.fundType != null and bo.fundType != 0">
+		 	AND f.type = #{bo.fundType} 
+		 </if>
+		 <if test="bo.deadline != null and bo.deadline != 0">
+		 	AND f.duration = #{bo.deadline} 
+		 </if>
+		 GROUP BY f.id 
+		 ) t  
+	</select>
+	
+	<select id="cruaListCount" resultType="int">
+		 select 
+		 count(1)   
+		 from fund f 
+	</select>
+	
+	<select id="getSeriesList" resultType="SelectResultVo">
+		SELECT DISTINCT series_name name,0 id  
+		FROM fund WHERE series_name IS NOT NULL 
+	</select>
+	
+	<select id="hasBuyFund" resultType="int">
+		SELECT COUNT(1) FROM user_apply WHERE user_second_id=#{userSecondId} AND fund_id =#{fundId} AND apply_status=68
+	</select>
+	
+	<select id="getMaxIndex" resultType="int">
+		SELECT MAX(IFNULL(page_index,0)) FROM fund
+	</select>
+</mapper>

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mapper.QuestionMapper" >
+  <resultMap id="BaseResultMap" type="Question" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="VARCHAR" />
+    <result column="sort" property="sort" jdbcType="INTEGER" />
+    <result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
+    <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+    <result column="qt_id" property="qtId" jdbcType="INTEGER" />
+    <result column="qtName" property="qtName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    q.id, q.create_time, q.update_time, q.name, q.type, q.start_time, q.end_time,q.sort,q.qt_id,qt.name qtName 
+  </sql>
+   <select id="getList" resultMap="BaseResultMap">
+		select 
+		<include refid="Base_Column_List" />
+		from question q 
+		INNER JOIN question_time qt ON q.qt_id = qt.id 
+		<where>
+			<if test="bo.qtId!=null">
+				and q.qt_id = #{bo.qtId}
+			</if>
+			<if test="bo.qtId==null">
+				and q.qt_id =''
+			</if>
+			<if test="bo.name!=null">
+				and q.name like CONCAT('%',#{bo.name},'%')
+			</if>
+	      </where> 
+	      <if test="pager.sort!=null">
+            order by q.${pager.sort} ${pager.order}
+        </if>
+	</select>
+	
+	<select id="getLastestId" resultType="long">
+		SELECT id FROM question_time WHERE type=#{type} ORDER BY start_time DESC LIMIT 0,1
+	</select>
+	
+	<sql id="cols">
+		f.id,
+		f.name,
+		f.start_time,
+		f.end_time,
+		f.sort  
+	</sql>
+	<resultMap id="detailMap" type="QuestionEditVo" >
+     	<id column="id" property="id"/>
+	    <result column="name" property="name" />
+	    <result column="no" property="no" />
+	    <result column="start_time" property="startTime" />
+	    <result column="end_time" property="endTime" />
+	    <result column="sort" property="sort" />
+	    <collection property="answers" ofType="QuestionAnswer" notNullColumn="rid">
+	    	<id column="rid" property="id"/>
+		    <result column="answer" property="answer" />
+		    <result column="prefix" property="prefix" />
+		    <result column="score" property="score" />
+	    </collection>
+  </resultMap>
+	<select id="findDetailById" resultMap="detailMap">
+		select
+		<include refid="cols"/>
+		,
+		r.id rid,
+		r.answer,
+		r.prefix,
+		r.score 
+		from question f 
+		 LEFT JOIN question_answer r ON f.id = r.question_id  
+		 WHERE f.id = #{id} ORDER BY r.prefix
+	</select>
+	
+	<select id="searchQuestionList" resultType="SelectResultVo">
+		select 
+		 id,
+		 name  
+		 FROM question_time 
+		 <if test="keyword !='' and null != keyword">
+			 WHERE name like CONCAT('',#{keyword},'%') 
+		 </if> 
+		 ORDER BY create_time DESC 
+	</select>
+	
+	<resultMap type="RiskTitleVo" id="RiskTitleMap">
+		<id property="type" column="type"/>
+		<result  property="title" column="title"/>
+		<collection property="subjects" ofType="RiskSubjectVo" notNullColumn="qeId">
+			<id property="qeId" column="qeId"/>
+			<result  property="sort" column="sort"/>
+			<result  property="subject" column="subject"/>
+			<collection property="answers" ofType="RiskAnswerVo" notNullColumn="qaId">
+				<id property="qaId" column="qaId"/>
+				<result  property="prefix" column="prefix"/>
+				<result  property="answer" column="answer"/>
+				<result  property="score" column="score"/>
+			</collection>
+		</collection>
+	</resultMap>
+	<select id="findRiskTitleById" resultMap="RiskTitleMap">
+		SELECT
+		q.type,
+		d.`name` title,
+		q.id qeId,
+	  	q.sort sort,
+		q.name subject,
+		qa.id qaId,
+		qa.prefix,
+		qa.answer,
+		qa.score 
+	 	FROM question q 
+		INNER JOIN question_answer qa ON q.id = qa.question_id 
+		INNER JOIN dictionary d ON q.type = d.id 
+		WHERE q.qt_id = #{qtId} 
+		ORDER BY q.sort,q.id,qa.prefix 
+	</select>
+	
+	<!-- 历史测评数据详情 -->
+	<resultMap type="RiskTitleVo" id="RiskHisMap">
+		<id property="type" column="type"/>
+		<result  property="title" column="title"/>
+		<collection property="subjects" ofType="RiskSubjectVo" notNullColumn="sort">
+			<id property="sort" column="sort"/>
+			<result  property="subject" column="subject"/>
+			<collection property="answers" ofType="RiskAnswerVo" notNullColumn="prefix">
+				<id property="prefix" column="prefix"/>
+				<result  property="answer" column="answer"/>
+				<result  property="checked" column="checked"/>
+			</collection>
+		</collection>
+	</resultMap>
+	<select id="getQHis" parameterType="long" resultMap="RiskHisMap">
+		SELECT 
+		q.type,
+		d.name title,
+		q.sort,
+		q.name subject,
+		qs.prefix,
+		qs.answer,
+		ABS(qs.id - qa.question_answer_id) checked  
+		 FROM question_user_record qu 
+		LEFT JOIN question_user_answer qa ON qu.id = qa.qu_id 
+		LEFT JOIN question q ON qa.question_id = q.id 
+		LEFT JOIN question_answer qs ON q.id = qs.question_id 
+		LEFT JOIN dictionary d ON q.type = d.id 
+		WHERE qu.id = #{quId} 
+		ORDER BY q.sort, qs.prefix 
+	</select>
+</mapper>

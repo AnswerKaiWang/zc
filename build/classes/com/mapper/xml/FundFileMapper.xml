@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mapper.FundFileMapper" >
+	<resultMap id="fund_file_map" type="FundFile" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="contant" property="contant"  />
+    <result column="type" property="type" jdbcType="VARCHAR" />
+    <result column="fund_id" property="fundId" jdbcType="BIGINT" />
+    <result column="begin_time" property="beginTime" jdbcType="TIMESTAMP" />
+    <result column="page_index" property="pageIndex" jdbcType="BIGINT" />
+    <result column="show_status" property="showStatus" jdbcType="TINYINT" />
+    <result column="url" property="url" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <resultMap id="fund_file_list_map" type="FundFileVo" extends="fund_file_map">
+  	<result column="fund_name" property="fundName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="fund_file_sql" >
+    id, create_time, update_time, name, type, fund_id, begin_time, page_index, show_status,url,contant
+  </sql>
+	
+	<select id="getList" resultMap="fund_file_list_map">
+		select 
+		ff.id, ff.create_time, ff.update_time, ff.name, ff.type, 
+		ff.fund_id, ff.begin_time, ff.page_index, ff.show_status,ff.url,ff.contant,f.name  fund_name
+		from fund_file ff
+		left join fund f on f.id=ff.fund_id
+		<where>
+			<if test="bo.name!=null">
+			and ff.name like CONCAT('%',#{bo.name},'%')
+			</if>
+			<if test="bo.fundId!=null">
+			and ff.fund_id=#{bo.fundId}
+			</if>
+			<if test="bo.type!=null">
+			and ff.type like CONCAT('%',#{bo.type},'%') 
+			</if>
+			<if test="bo.startTime!=null">
+			and ff.begin_time>=#{bo.startTime}
+			</if>
+			<if test="bo.endTime!=null">
+			and ff.begin_time &lt; #{bo.endTime}
+			</if>
+			<if test="bo.companyId!=null">
+			and ff.company_id=#{bo.companyId}
+			</if>
+			<if test="bo.fundName!=null">
+			and f.name like CONCAT('%',#{bo.fundName},'%')
+			</if>
+	      </where> 
+	      <if test="pager.sort!=null">
+            order by ff.${pager.sort} ${pager.order}
+        </if>
+	</select>
+	<select id="getFrontList" resultMap="fund_file_map">
+		select 
+		<include refid="fund_file_sql"></include>
+		from fund_file
+		<where>
+		fund_id=#{fundId} and show_status=0
+	     </where> 
+            order by page_index desc,create_time desc
+	</select>
+</mapper>

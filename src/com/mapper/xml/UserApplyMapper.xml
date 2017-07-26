@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mapper.UserApplyMapper" >
+  <sql id="user_apply_list_sql" >
+	ua.id, 
+	ua.create_time createTime, 
+	ua.update_time updateTime, 
+	ua.fund_id fundId, 
+	ua.confir_user_id confirUserId, 
+	ua.apply_money applyMoney,
+	ua.confir_money confirMoney, 
+	ua.user_second_id userSecondId,
+	ua.apply_status applyStatus, 
+	ua.apply_way applyWay,
+	ua.confir_date confirDate,
+	ua.note 
+  </sql>
+  <select id="getList" resultType="UserApplyVo">
+		select 
+		<include refid="user_apply_list_sql" />
+		,
+		f.name fundName,
+		us.name custName,
+		u.real_name confirUserName,
+		IF(ISNULL(usc.zhizhao),usp.per_card_no,usc.zhizhao) custNo,
+		IF(ISNULL(usc.com_phone),usp.per_phone,usc.com_phone) phone 
+		FROM user_apply ua 
+		INNER JOIN user_second us ON ua.user_second_id = us.id 
+			<!-- 财富顾问专属的 -->
+			<if test="bo.memberId != 0">
+				AND us.member_id = #{bo.memberId}
+			</if>
+		LEFT JOIN  member u on ua.confir_user_id=u.id
+		LEFT JOIN  fund f on ua.fund_id=f.id 
+		LEFT JOIN user_second_com usc ON us.id = usc.id 
+		LEFT JOIN user_second_per usp ON us.id = usp.id 
+		<where> 
+			ua.fund_id = #{bo.fundId}
+			<if test="bo.fundName != null">
+			and  f.name  like concat('',#{bo.fundName},'%') 
+			</if>
+			<if test="bo.status!=null">
+				and ua.apply_status=#{bo.status}
+			</if>
+			<if test="bo.startTime!=null">
+			and ua.create_time>=#{bo.startTime}
+			</if>
+			<if test="bo.endTime!=null">
+			and ua.create_time &lt; #{bo.endTime}
+			</if>
+			<if test="bo.custName!=null">
+				us.name like concat('',#{bo.custName},'%') 
+			</if>
+			<if test="bo.custNo!=null">
+				and ( usc.zhizhao like concat('',#{bo.custNo},'%')
+					OR 
+					usp.per_card_no like concat('',#{bo.custNo},'%')
+				)
+			</if>
+			<if test="bo.phone!=null">
+				and  
+				( usc.com_phone like concat('',#{bo.phone},'%')
+					OR 
+					usp.per_phone like concat('',#{bo.phone},'%')
+				)
+			</if>
+	      </where> 
+	      <if test="pager.sort!=null and pager.sort=='create_time'">
+            order by ua.${pager.sort} ${pager.order}
+          </if>
+	</select>
+	
+	<select id="findDetailById" resultType="UserApplyVo">
+		select 
+		<include refid="user_apply_list_sql" />
+		,
+		f.name fundName,
+		us.name custName,
+		u.name confirUserName,
+		IF(ISNULL(usc.zhizhao),usp.per_card_no,usc.zhizhao) custNo  
+		FROM user_apply ua 
+		LEFT JOIN user_second us ON ua.user_second_id = us.id 
+		LEFT JOIN  user u on ua.confir_user_id=u.id
+		LEFT JOIN  fund f on ua.fund_id=f.id 
+		LEFT JOIN user_second_com usc ON us.id = usc.id 
+		LEFT JOIN user_second_per usp ON us.id = usp.id 
+		WHERE ua.id = #{id}
+	</select>
+	
+	<select id="searchAmount" resultType="UserApplyAmountVo">
+		SELECT f.plan_collect_money - IFNULL(SUM(ua.confir_money),0) remain,
+		f.plan_collect_money total 
+		FROM fund f 
+		LEFT JOIN user_apply ua ON ua.fund_id = f.id 
+		WHERE ua.fund_id =  #{fundId}
+	</select>
+	<!-- 预约查询：前台 -->
+	<select id="curaList" parameterType="AppointmentQueryBo" resultType="AppointmentQueryVo">
+		SELECT 
+		u.fund_id fundId,
+		f.series_name seriesName,
+		f.name fundName,
+		u.user_second_id userSecondId,
+		m.real_name consultName,
+		us.name custName,
+		f.company_id companyId,
+		c.name companyName 
+		FROM user_apply u 
+		INNER JOIN fund f ON u.fund_id = f.id 
+		INNER JOIN user_second us ON u.user_second_id = us.id 
+		LEFT JOIN member m ON us.member_id = m.id 
+		LEFT JOIN company c ON f.company_id = c.id 
+		WHERE  u.user_second_id = #{userSecondId}
+		<if test="type != null and type != 0">
+			and  f.type = #{type}
+		</if>
+		<if test="lawWay != null and lawWay != 0">
+			and  f.law_way = #{lawWay}
+		</if>
+		<if test="duration !=null and duration != 0">
+			and f.duration=#{duration}
+		</if>
+		GROUP BY u.fund_id 
+	      ORDER BY f.create_time DESC LIMIT #{start}, #{pageSize}
+	</select>
+	<!-- 预约-详情 -->
+	<select id="curaDetailList" parameterType="AppointmentQueryBo" resultType="UserApplyVo">
+		select 
+		<include refid="user_apply_list_sql" />
+		,
+		f.name fundName,
+		us.name custName,
+		u.real_name confirUserName,
+		IF(ISNULL(usc.zhizhao),usp.per_card_no,usc.zhizhao) custNo,
+		IF(ISNULL(usc.com_phone),usp.per_phone,usc.com_phone) phone 
+		FROM user_apply ua 
+		INNER JOIN user_second us ON ua.user_second_id = us.id 
+		LEFT JOIN  fund f on ua.fund_id=f.id 
+		LEFT JOIN  member u on ua.confir_user_id=u.id 
+		LEFT JOIN user_second_com usc ON us.id = usc.id 
+		LEFT JOIN user_second_per usp ON us.id = usp.id
+		WHERE  ua.user_second_id = #{userSecondId} AND ua.fund_id = #{fundId}
+		<if test="type != null and type != 0">
+			and  f.type = #{type}
+		</if>
+		<if test="lawWay != null and lawWay != 0">
+			and  f.law_way = #{lawWay}
+		</if>
+		<if test="duration !=null and duration != 0">
+			and f.duration=#{duration}
+		</if>
+	</select>
+	
+	<!-- 已投产品查询 -->
+	<select id="curaInvestedList" parameterType="AppointmentQueryBo" resultType="InvestedVo">
+		select 
+		f.id fundId,
+		f.series_name seriesName,
+		u.user_no buyAccount,
+		u.name buyUserName  
+		from user_share us
+		INNER JOIN  user u on us.user_id=u.id
+		INNER JOIN  fund f on us.fund_id=f.id 
+		WHERE u.card_no = #{cardNo} 
+		<if test="type != null and type != 0">
+			and  f.type = #{type}
+		</if>
+		<if test="lawWay != null and lawWay != 0">
+			and  f.law_way = #{lawWay}
+		</if>
+		<if test="duration !=null and duration != 0">
+			and f.duration=#{duration}
+		</if>
+			GROUP BY f.id 
+		 	ORDER BY us.create_time DESC 
+		 	LIMIT #{start}, #{pageSize}
+	</select>
+	
+	<select id="curaInvestAmount" resultType="long">
+		SELECT SUM((CASE WHEN us.type='add' OR us.type='ok' THEN us.money WHEN us.type='back' THEN 0-us.money ELSE 0 END)) as investAmount 
+		FROM user_share us
+		INNER JOIN user u ON us.user_id = u.id 
+		WHERE u.card_no = #{cardNo}
+	</select>
+	<!-- 分红查询 -->
+	<select id="curaProfitList" parameterType="AppointmentQueryBo" resultType="ProfitVo">
+		select 
+		f.id fundId,
+		f.name fundName,
+		u.name buyUserName 
+		from user_bonus ub
+		INNER join  user u on ub.user_id=u.id
+		INNER join  fund f on ub.fund_id=f.id 
+		WHERE u.card_no = #{cardNo} 
+		<if test="type != null and type != 0">
+			and  f.type = #{type}
+		</if>
+		<if test="lawWay != null and lawWay != 0">
+			and  f.law_way = #{lawWay}
+		</if>
+		<if test="duration !=null and duration != 0">
+			and f.duration=#{duration}
+		</if>
+			GROUP BY f.id 
+		 	ORDER BY ub.create_time DESC 
+		 	LIMIT #{start}, #{pageSize}
+	</select>
+</mapper>

@@ -1,0 +1,195 @@
+﻿<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+<meta name="renderer" content="webkit" />
+<title>中城投资</title>
+<link type="text/css" rel="stylesheet" href="http://at.alicdn.com/t/font_1470257308_7612898.css" />
+<link type="text/css" rel="stylesheet" href="${base}/frontCura/style/animate.css" />
+<link type="text/css" rel="stylesheet" href="${base}/frontCura/style/index.css" />
+<script  type="text/javascript" src="${base}/frontCura/js/jquery-1.7.1.js"></script>
+<script  type="text/javascript" src="${base}/frontCura/js/common.js"></script>
+<!--[if lt IE 9]>
+<script src="${base}/frontCura/js/ie/html5.js"></script>
+<script src="${base}/frontCura/js/ie/selectivizr-min.js"></script>
+<![endif]-->
+</head>
+<body>
+<!-- top s -->
+<div class="top">
+  <div class="wrap">
+    <div class="R fr">
+      <ul>
+        <li class="user_name">X先生/ 女士，欢迎您！</li>
+        <li class="guwena"><i class="ico ico-kefu"></i>财富顾问</li>
+        <li><a href="appointment_zc.html">查看账户</a></li>
+        <!--
+		        <li><a href="javascript:void(0)">在线客服</a></li>
+		        -->
+        <li><i class="ico ico-iconfontyoujian"></i><a href="${base}/cura/cust/message.htm" class="mail">10</a>封未读通知</li>
+        <li class="weixina"><i class="ico ico-weixin"></i>关注我们</li>
+        <li><i class="ico ico-phone_1"></i><span class="tel">400-800-1000</span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+<div class="guwenBox"><i class="jiao"></i><i class="ico ico-kefu"></i><em>159333337777</em></div>
+<div class="weixinBox"><i class="jiao"></i><img src="${base}/frontCura/images/cd.jpg" alt="">
+  <p>扫一扫，关注微信公众号</p>
+</div>
+<!-- top e --> 
+<!-- header s -->
+<header class="header">
+  <div class="wrap"> <a href="${base}/" class="logo"><img src="${base}/frontCura/images/logo.png" alt=""></a>
+    <nav class="nav">
+      <ul>
+        <li><a href="${base}/cura/news.htm">财智资讯</a></li>
+        <li><a href="javascript:void(0);" onclick="javascript:toProduct('${base}');">基金产品</a></li>
+        <li><a href="javascript:void(0);" onclick="javascript:toCustCenter('${base}');">客户中心</a></li>
+        <li><a href="${base}/cura/about.htm">关于我们</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<!-- header e -->
+<!-- banner s -->
+<div class="banner">
+  <div class="user_Box">
+    <p class="bjbox"></p>
+    <div class="wrap">
+      <dl class="L">
+        <dt><a href="###"><img src="这里是用户头像图片" alt="" width="140" height="140"></a></dt>
+        <dd>
+          <div class="dd_inner">
+            <p>客户姓名：${loginSuccessKey.name}</p>
+            <p>客户等级：${loginSuccessKey.level}</p>
+            <p>客户类型：${loginSuccessKey.type}</p>
+            <p>客户风险评级：
+            	<!-- 已过期 -->
+            	[#if loginSuccessKey.expired == 1]
+            		已过期
+            	[/#if]
+            	[#if loginSuccessKey.expired == 0]
+            		[#if loginSuccessKey.riskLevelName == null]
+	            		未测评
+	            	[/#if]
+	            	[#if loginSuccessKey.riskLevelName != null]
+	            		${loginSuccessKey.riskLevelName}　${(loginSuccessKey.evaluationTime)?string('yyyy-MM-dd')}到期
+	            	[/#if]
+            	 [/#if]
+            <a href="#" class="cxp" id="show_cppc_popup_2">[重新测评]</a><a href="#" class="cxp">[打印]</a></p>
+          </div>
+        </dd>
+      </dl>
+      <div class="R">
+        <div class="r_inner">
+          <p>我的在投金额：<b>0万元</b></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- banner e -->
+<style type="text/css">
+/*本页样式*/
+body{background-color: #f9f9f9;}
+</style>
+<!-- main s -->
+<div class="main">
+  <!-- queryPage_Left s -->
+  <div class="queryPage_Left">
+    <ul class="Menu">
+      <li><a href="#" class="active">我的投资</a></li>
+      <li><a href="#">我的账户</a></li>
+      <li><a href="#">积分兑换</a></li>
+    </ul>
+  </div>
+  <!-- queryPage_Left e -->
+  <!-- queryPage_Right s -->
+  <div class="queryPage_Right">
+    <p class="search_tab_title"><a href="ytcp_gl.html">已投产品查询</a><a href="fhcx_gl.html">分红查询</a><a href="appointment_guanli.html" class="active">预约查询</a></p>
+    <dl class="choice_list">
+      <dt>产品类别：</dt>
+      <dd>
+        <a href="#" class="active">全部</a>
+        <a href="#">房地产基金</a>
+        <a href="#">权益类基金</a>
+        <a href="#">证券类基金</a>
+        <a href="#">其他</a>
+      </dd>
+    </dl>
+    <dl class="choice_list">
+      <dt>法律形式：</dt>
+      <dd>
+        <a href="#" class="active">全部</a>
+        <a href="#">有限合伙基金</a>
+        <a href="#">契约型基金</a>
+        <a href="#">其他</a>
+      </dd>
+    </dl>
+    <dl class="choice_list">
+      <dt>产品期限：</dt>
+      <dd>
+        <a href="#" class="active">全部</a>
+        <a href="#">1年</a>
+        <a href="#">2年</a>
+        <a href="#">3年及以上</a>
+      </dd>
+    </dl>
+    <div class="ResultBox">
+    <table border="0" cellspacing="0" cellpadding="0" class="table_3">
+      <tr>
+        <th width="230" align="left">产品名称</th>
+        <th width="90" align="center">预约投资金额(元)</th>
+        <th width="110" align="center">收益分配周期</th>
+        <th width="110" align="center">产品状态</th>
+        </tr>
+      <tr>
+        <td width="230" align="left"><a href="ago_details.html">重仓深圳·城市更新策略精选1期</a></td>
+        <td width="90" align="center">500,000</td>
+        <td width="110" align="center">1+1+2</td>
+        <td width="110" align="center">募集</td>
+        </tr>
+      <tr>
+        <td width="230" align="left"><a href="ago_details.html">重仓深圳·城市更新策略精选1期</a></td>
+        <td width="90" align="center">500,000</td>
+        <td width="110" align="center">1+1+2</td>
+        <td width="110" align="center">募集</td>
+        </tr>
+      <tr>
+        <td width="230" align="left"><a href="ago_details.html">重仓深圳·城市更新策略精选1期</a></td>
+        <td width="90" align="center">500,000</td>
+        <td width="110" align="center">1+1+2</td>
+        <td width="110" align="center">募集</td>
+        </tr>
+    </table>
+    </div>
+    <div class="page_2">
+      	<a href="#" title="首页">&lt;&lt;</a>
+      	<a href="#" title="上一页">&lt;</a>
+      	<a href="#" class="active">1</a>
+      	<a href="#">2</a>
+      	<a href="#">3</a>
+      	<a href="#">4</a>
+      	<a href="#">5</a>
+      	<a href="#" title="下一页">&gt;</a>
+        <a href="#" title="尾页">&gt;&gt;</a>
+     </div>    
+  </div>
+  <!-- queryPage_Right e -->
+</div>
+<!-- main e --> 
+<!-- footer s -->
+<footer class="footer">
+  <div class="ft_t">
+    <div class="wrap"> <a href="">帮助中心</a> <a href="">新手指引</a> <a href="">中城投资</a> </div>
+  </div>
+  <div class="ft_b">
+    <div class="wrap">CopyRight&nbsp;&nbsp;&nbsp;&nbsp;2015~2016 版权所有&nbsp;&nbsp;&nbsp;&nbsp;上海中城联盟财富金融信息服务有限公司&nbsp;&nbsp;&nbsp;&nbsp;沪ICP13017167号 </div>
+  </div>
+</footer>
+<!-- footer e -->
+
+</body>
+</html>

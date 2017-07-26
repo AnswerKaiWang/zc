@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mapper.QtSurveyMapper" >
+	<!-- 问卷调查 -->
+   <select id="getList" resultType="QtSurvey">
+		select 
+		id,
+		name,
+		start_time startTime,
+		end_time endTime 
+		from qt_survey 
+		<where>
+			<if test="bo.name!=null">
+				and name like CONCAT('%',#{bo.name},'%')
+			</if>
+	      </where> 
+	      <if test="pager.sort!=null">
+            order by ${pager.sort} ${pager.order}
+        </if>
+	</select>
+	
+	<select id="getMaxEndTime" resultType="date">
+		SELECT MAX(end_time) FROM qt_survey 
+		<if test="id != null">
+			WHERE id != #{id}
+		</if>
+	</select>
+	
+	<select id="searchQsList" resultType="SelectResultVo">
+		select 
+		 id,
+		 name  
+		 FROM qt_survey 
+		 <if test="keyword !='' and null != keyword">
+			 WHERE name like CONCAT('',#{keyword},'%') 
+		 </if> 
+		 ORDER BY start_time DESC 
+	</select>
+	
+	<select id="getLastestQt" resultType="long">
+		select 
+		id FROM qt_survey ORDER BY start_time DESC LIMIT 0,1
+	</select>
+	
+	<resultMap type="QsVo" id="QsVoMap">
+		<id column="qs_type" property="qsType"/>
+		<result column="qsId" property="qsId"/>
+		<collection property="topics" ofType="QstVo" notNullColumn="id">
+			<id column="id" property="id"/>
+			<result column="sort" property="sort"/>
+			<result column="title" property="title"/>
+			<result column="type" property="type"/>
+			<collection property="answers" ofType="QsaVo" notNullColumn="qaId">
+				<id column="qaId" property="id"/>
+				<result column="prefix" property="prefix"/>
+				<result column="answer" property="answer"/>
+			</collection>
+		</collection>
+	</resultMap>
+	<select id="getQsVo" resultMap="QsVoMap">
+		SELECT 
+		qt.qs_id qsId,
+		qt.qs_type,
+		qt.id,
+		qt.sort,
+		qt.title,
+		qt.type,
+		qa.id qaId,
+		qa.prefix,
+		qa.answer 
+		FROM qt_survey_topic qt 
+		LEFT JOIN qt_survey_answer qa ON qt.id = qa.qst_id 
+		WHERE qt.qs_id=#{qsId} ORDER BY qt.qs_type,qt.sort,qa.prefix
+	</select>
+</mapper>

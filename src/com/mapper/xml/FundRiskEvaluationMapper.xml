@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mapper.FundRiskEvaluationMapper" >
+	<select id="getList" resultType="FundRiskEvaluation">
+		SELECT
+		id,
+		risk_level riskLevel,
+		risk_nature riskNature,
+		risk_introduce riskIntroduce,
+		suit_investor suitInvestor,
+		create_time createTime,
+		update_time updateTime  
+		FROM fund_risk_evaluation 
+		<if test="pager.sort!=null and pager.sort=='create_time'">
+			order by ${pager.sort} ${pager.order}
+		</if>
+	</select>
+</mapper>

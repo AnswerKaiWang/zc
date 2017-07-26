@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mapper.UserSecondPerMapper">
+	<resultMap type="CustFileVo" id="fileMap">
+		<id property="id" column="id" />
+		<result property="custId" column="custId" />
+		<result property="custName" column="custName" />
+		<result property="cardTypeId" column="cardTypeId" />
+		<result property="cardTypeName" column="cardTypeName" />
+		<result property="custNo" column="custNo" />
+		<result property="picName" column="picName" />
+		<result property="validateTime" column="validateTime" />
+		<result property="createTime" column="createTime" />
+	</resultMap>
+	<select id="getList" resultMap="fileMap">
+		select
+		usp.id id,
+		usp.cust_id custId,
+		us.name custName,
+		usp.card_type_id cardTypeId,
+		d.name cardTypeName,
+		usp.pic_name picName,
+		IF(ISNULL(usc.qixian),usr.per_qixian,usc.qixian) validateTime,
+		usp.pic_create_time createTime,
+		IF(ISNULL(usc.zhizhao),usr.per_card_no,usc.zhizhao) custNo
+		FROM user_second_pic usp
+		INNER JOIN user_second us ON usp.cust_id = us.id
+		LEFT JOIN dictionary d ON usp.card_type_id = d.id
+		LEFT JOIN user_second_com usc ON us.id = usc.id
+		LEFT JOIN user_second_per usr ON us.id = usr.id
+		<where>
+			<if test="bo.userSecondId!=null">
+				and us.id = #{bo.userSecondId}
+			</if>
+			<if test="bo.cardNo!=null">
+				and  (
+					usc.zhizhao like CONCAT('%',#{bo.cardNo},'%') 
+				OR 
+					usr.per_card_no like CONCAT('%',#{bo.cardNo},'%') 
+				)
+			</if>
+			<if test="bo.cardType!=null">
+				and usp.card_type_id =#{bo.cardType}
+			</if>
+			<if test="bo.fileName!=null">
+				and usp.pic_name like CONCAT('%',#{bo.fileName},'%')
+			</if>
+			<if test="bo.startTime!=null">
+				and usp.create_time >= #{bo.startTime}
+			</if>
+			<if test="bo.endTime!=null">
+				and usp.create_time &lt; #{bo.endTime}
+			</if>
+		</where>
+		<if test="pager.sort!=null">
+			order by usp.${pager.sort} ${pager.order}
+		</if>
+	</select>
+</mapper>

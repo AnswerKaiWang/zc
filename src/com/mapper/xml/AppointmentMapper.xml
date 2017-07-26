@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mapper.AppointmentMapper" >
+  <select id="getList" resultType="Appointment">
+		SELECT 
+		t.id,
+		t.name,
+		t.phone,
+		t.city,
+		t.province,
+		t.start_time startTime,
+		t.end_time endTime,
+		t.callback_status callbackStatus,
+		t.create_time createTime,
+		t.update_time updateTime,
+		t.remark    
+		FROM appointment t 
+		<where>
+			<if test="bo.name != null">
+				AND t.name like concat('%',#{bo.name},'%')
+			</if>
+			<if test="bo.phone != null">
+				AND t.phone like concat('%',#{bo.phone},'%')
+			</if>
+			<if test="bo.callbackStatus != null">
+				AND t.callback_status = #{bo.callbackStatus}
+			</if>
+			<if test="bo.startTime != null">
+				AND t.start_time >= #{bo.startTime} 
+			</if>
+			<if test="bo.endTime != null">
+				AND t.end_time &lt;=#{bo.endTime}
+			</if>
+		</where>
+	      <if test="pager.sort!=null and pager.sort=='create_time'">
+            order by t.${pager.sort} ${pager.order}
+          </if>
+	</select>
+</mapper>

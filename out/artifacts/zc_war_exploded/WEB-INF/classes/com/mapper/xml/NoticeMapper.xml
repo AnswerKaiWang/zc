@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mapper.NoticeMapper">
+	<select id="getList" resultType="Notice">
+		SELECT
+		t.id,
+		t.create_time createTime,
+		t.title,
+		t.content,
+		t.url 
+		FROM notice t
+		<where>
+			<if test="bo.title != null"> 
+				AND t.title like concat('%',#{bo.title},'%')
+			</if>
+		</where>
+		<if test="pager.sort!=null and pager.sort=='create_time'">
+			order by t.${pager.sort} ${pager.order}
+		</if>
+	</select>
+	<!-- 最新公告 -->
+	<select id="getLatest" resultType="Notice">
+		SELECT
+		t.id,
+		t.create_time createTime,
+		t.title,
+		t.content,
+		t.url 
+		FROM notice t 
+		ORDER BY t.create_time  DESC LIMIT 0,3
+	</select>
+</mapper>

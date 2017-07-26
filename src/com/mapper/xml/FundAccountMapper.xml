@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mapper.FundAccountMapper" >
+	
+	<resultMap id="fund_account_map" type="FundAccount" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="begin_time" property="beginTime" jdbcType="TIMESTAMP" />
+    <result column="fund_id" property="fundId" jdbcType="BIGINT" />
+    <result column="company_id" property="companyId" jdbcType="BIGINT" />
+    <result column="money" property="money" jdbcType="BIGINT" />
+    <result column="all_money" property="allMoney" jdbcType="BIGINT" />
+    <result column="rose" property="rose" jdbcType="BIGINT" />
+  </resultMap>
+  <resultMap id="fund_account_list_map" type="FundAccountVo" extends="fund_account_map">
+  	<result column="fund_name" property="fundName" jdbcType="VARCHAR" />
+  	<result column="no" property="no" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="fund_account_sql" >
+    id, create_time, update_time, begin_time, fund_id, money, all_money, rose,company_id
+  </sql>
+  
+  <select id="getList" resultMap="fund_account_list_map">
+		select 
+		fa.id, fa.create_time, fa.update_time, fa.begin_time, fa.fund_id, fa.money, fa.all_money, fa.rose,f.name fund_name,f.no
+		from fund_account fa
+		left join fund f on f.id=fa.fund_id
+		<where>
+			<if test="bo.fundId!=null">
+			and fa.fund_id=#{bo.fundId}
+			</if>
+			<if test="bo.startTime!=null">
+			and fa.begin_time>=#{bo.startTime}
+			</if>
+			<if test="bo.endTime!=null">
+			and fa.begin_time &lt; #{bo.endTime}
+			</if>
+			<if test="bo.sm!=null">
+			and fa.money>=#{bo.sm}
+			</if>
+			<if test="bo.em!=null">
+			and fa.money &lt;= #{bo.em}
+			</if>
+			<if test="bo.companyId!=null">
+			and fa.company_id = #{bo.companyId}
+			</if>
+			<if test="bo.fundName!=null">
+			and f.name like CONCAT('%',#{bo.fundName},'%')
+			</if>
+	      </where> 
+	      <if test="pager.sort!=null and pager.sort!='fund_name'">
+            order by fa.${pager.sort} ${pager.order}
+       	   </if>
+       	   <if test="pager.sort!=null and pager.sort=='fund_name'">
+            order by f.name ${pager.order},fa.id desc
+       	   </if>
+	</select>
+	<select id="getFrontList" resultMap="fund_account_map">
+		select
+		<include refid="fund_account_sql"></include>
+		from fund_account
+		where fund_id=#{fundId}
+		order by begin_time desc,id desc
+	</select>
+</mapper>

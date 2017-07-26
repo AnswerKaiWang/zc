@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.UserShareMapper">
+  <resultMap id="user_share_map" type="UserShare">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="fund_id" jdbcType="BIGINT" property="fundId" />
+    <result column="user_id" jdbcType="BIGINT" property="userId" />
+    <result column="ok_time" jdbcType="TIMESTAMP" property="okTime" />
+    <result column="fund_account_money" jdbcType="BIGINT" property="fundAccountMoney" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="money" jdbcType="BIGINT" property="money" />
+    <result column="share" jdbcType="BIGINT" property="share" />
+    <result column="company_id" jdbcType="BIGINT" property="companyId" />
+  </resultMap>
+  <resultMap id="user_share_list_map" type="UserShareVo" extends="user_share_map">
+  	<result column="fund_name" property="fundName" />
+  	<result column="name" property="name"  />
+  	<result column="phone" property="phone"  />
+  	<result column="card_no" property="cardNo"  />
+  	<result column="no" property="no"  />
+  	<result column="userNo" property="userNo"  />
+  </resultMap>
+  <sql id="user_share_sql">
+    us.id, us.create_time, us.update_time, us.fund_id, us.user_id, us.ok_time, us.fund_account_money, us.type, 
+    us.money, us.share, us.company_id
+  </sql>
+  <select id="getByFundIdAndUserId" resultMap="user_share_map">
+  	select 
+  <include refid="user_share_sql" />
+ 	from user_share us
+ 	where 
+ 	us.fund_id=#{fundId} and us.user_id=#{userId}
+  </select>
+  <select id="getList" resultMap="user_share_list_map">
+		select 
+		<include refid="user_share_sql" />
+		,u.phone phone,
+		u.name name,
+		u.user_no userNo,
+		u.card_no card_no,
+		f.no no,
+		f.name fundName
+		from user_share us
+		left join  user u on us.user_id=u.id
+		left join  fund f on us.fund_id=f.id
+		<where>
+			<if test="bo.startTime!=null">
+			and us.ok_time>=#{bo.startTime}
+			</if>
+			<if test="bo.endTime!=null">
+			and us.ok_time &lt; #{bo.endTime}
+			</if>
+			<if test="bo.companyId!=null">
+			and us.company_id=#{bo.companyId}
+			</if>
+			<if test="bo.type!=null">
+			and us.type=#{bo.type}
+			</if>
+			<if test="bo.name!=null">
+			and  u.name like CONCAT('%',#{bo.name},'%')
+			</if>
+			<if test="bo.phone!=null">
+			and  u.phone like CONCAT('%',#{bo.phone},'%')
+			</if>
+			<if test="bo.userNo!=null">
+			and  u.user_no like CONCAT('%',#{bo.userNo},'%')
+			</if>
+			<if test="bo.cardNo!=null">
+			and  u.card_no like CONCAT('%',#{bo.cardNo},'%')
+			</if>
+			<if test="bo.fundId!=null">
+			and f.fund_id=#{bo.fundId}
+			</if>
+			<if test="bo.fundName!=null">
+			and f.name like CONCAT('%',#{bo.fundName},'%')
+			</if>
+	      </where> 
+          <if test="pager.sort!=null and pager.sort=='ok_time'">
+            order by us.${pager.sort} ${pager.order}
+          </if>
+	</select>
+	<select id="getCunxuFromDate" resultType="UserShareCunxuVo">
+		SELECT us.fund_id fundId,f.name fundName,
+		f.duration duration,
+		f.size,
+		f.begin_time  beginTime,
+		f.no,
+		f.bei,
+		sum(us.money) money,us.type type
+		FROM `user_share` as us 
+		left join  user u on us.user_id=u.id
+		LEFT JOIN fund as f on us.fund_id=f.id 
+		<where>
+		<if test="bo.userId!=null">
+			and us.user_id=#{bo.userId}
+		</if>
+		<if test="bo.companyId!=null">
+			and f.company_id=#{bo.companyId}
+		</if>
+		<if test="bo.startTime!=null">
+			and us.ok_time>=#{bo.startTime}
+		</if>
+		<if test="bo.cardNo!=null">
+			and  u.card_no = #{bo.cardNo}
+		</if>
+		<if test="bo.fundStatus!=null">
+			and f.status in
+			<foreach collection="bo.fundStatus" open="(" close=")" item="ff" separator=",">
+			#{ff}
+			</foreach>
+		</if>
+		</where>
+		GROUP BY  us.fund_id,us.type
+		order by f.begin_time desc
+	</select>
+	
+	<select id="getUserCurrent" resultType="UserShareCunxuVo">
+		SELECT us.fund_id fundId,
+		f.name fundName,
+		f.duration duration,
+		f.begin_time  beginTime,
+		us.money money,
+		us.type type,
+		us.ok_time okTime,
+		us.create_time createTime,
+		us.fund_account_money as fundAccountMoney,
+		us.share share
+		FROM `user_share` as us
+		left join  user u on us.user_id=u.id
+		LEFT JOIN fund as f on us.fund_id=f.id 
+		<where>
+		<if test="bo.companyId!=null">
+			and f.company_id=#{bo.companyId}
+		</if>
+		<if test="bo.userId!=null">
+			and us.user_id=#{bo.userId}
+		</if>
+		<if test="bo.startTime!=null">
+			and us.ok_time>=#{bo.startTime}
+		</if>
+		<if test="bo.endTime!=null">
+			and us.ok_time &lt;=#{bo.endTime}
+		</if>
+		<if test="bo.cardNo!=null">
+			and  u.card_no = #{bo.cardNo}
+		</if>
+		<if test="bo.name!=null">
+			and f.name like CONCAT('%',#{bo.name},'%')
+		</if>
+		<if test="bo.orderType!=null">
+			and us.type=#{bo.orderType}
+		</if>
+		<if test="bo.fundStatus!=null">
+			and f.status in
+			<foreach collection="bo.fundStatus" open="(" close=")" item="ff" separator=",">
+			#{ff}
+			</foreach>
+		</if>
+		</where>
+		order by us.ok_time desc
+	</select>
+	
+	
+	<select id="getFundShare" parameterType="AppointmentQueryBo" resultType="UserShareCunxuVo">
+		SELECT 
+		us.fund_id fundId,
+		f.name fundName,
+		f.duration duration,
+		f.size,
+		f.no,
+		f.bei_no bei,
+		us.share,
+		us.ok_time okTime,
+		sum(us.money) money,
+		us.fund_account_money fundAccountMoney,
+		us.type type
+		FROM `user_share` as us 
+		left join  user u on us.user_id=u.id
+		LEFT JOIN fund as f on us.fund_id=f.id 
+		WHERE u.card_no = #{cardNo} AND us.fund_id = #{fundId} 
+		<if test="type != null and type != 0">
+			and  f.type = #{type}
+		</if>
+		<if test="lawWay != null and lawWay != 0">
+			and  f.law_way = #{lawWay}
+		</if>
+		<if test="duration !=null and duration != 0">
+			and f.duration=#{duration}
+		</if>
+	</select>
+</mapper>

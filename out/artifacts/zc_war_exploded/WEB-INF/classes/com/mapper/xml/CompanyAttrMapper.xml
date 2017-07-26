@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mapper.CompanyAttrMapper" >
+  <resultMap id="company_attr_map" type="CompanyAttr" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="contant" property="contant" jdbcType="VARCHAR" />
+    <result column="company_id" property="companyId" jdbcType="BIGINT" />
+  </resultMap>
+  <sql id="company_attr_sql" >
+    id, create_time, update_time, name, contant, company_id
+  </sql>
+  <select id="getByName" resultMap="company_attr_map">
+  select 
+  <include refid="company_attr_sql"></include>
+  from company_attr
+  where company_id=#{companyId}
+  and name=#{name}
+  </select>
+   <select id="getLikeName" resultMap="company_attr_map">
+  select 
+  <include refid="company_attr_sql"></include>
+  from company_attr
+  where company_id=#{companyId}
+  and name like CONCAT('',#{name},'%')
+  order by name asc
+  </select>
+  <select id="getByNames" resultMap="company_attr_map">
+  select 
+  <include refid="company_attr_sql"></include>
+  from company_attr
+  where company_id=#{companyId}
+  <if test="names!=null">
+  and name in
+  <foreach collection="names" open="(" close=")" separator="," item="na">
+  	#{na}
+  </foreach>
+  </if>
+  order by name asc
+  </select>
+</mapper>

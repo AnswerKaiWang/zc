@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mapper.PermissionMapper" >
+  <resultMap id="permission_map" type="Permission" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="value" property="value" jdbcType="VARCHAR" />
+    <result column="icon_cls" property="iconCls" jdbcType="VARCHAR" />
+    <result column="groups" property="groups" jdbcType="VARCHAR" />
+    <result column="parent_id" property="parentId" jdbcType="BIGINT" />
+    <result column="create_time" property="createTime" jdbcType="BIGINT" />
+  </resultMap>
+  <sql id="permission_sql" >
+    id, name, value, icon_cls, groups, parent_id,create_time
+  </sql>
+  
+  <select id="getPermissionByUserId" parameterType="Long" resultMap="permission_map">
+  		select 
+  		 p.id as id,
+  		 p.name as name, 
+  		 p.value as value, 
+  		 p.icon_cls as icon_cls, 
+  		 p.groups as groups, 
+  	     p.parent_id as parent_id
+  		from
+  		permission as p
+  		inner join role_permission as rp on p.id=rp.permission_id
+  		where rp.role_id in (
+			select 
+				r.id
+				from role as r
+				inner join member_role as mr on r.id=mr.role_id
+					where mr.member_id=#{memberId} and r.status='use'
+			)
+	</select>
+	
+	<select id="getPermissionByRoleId" parameterType="Long" resultMap="permission_map">
+  		select 
+  		 p.id as id,
+  		 p.name as name, 
+  		 p.value as value, 
+  		 p.icon_cls as icon_cls, 
+  		 p.groups as groups, 
+  	     p.parent_id as parent_id
+  		from
+  		permission as p
+  		inner join role_permission as rp on p.id=rp.permission_id
+  		where rp.role_id=#{roleId}
+	</select>
+	<select id="getNav" resultMap="permission_map">
+	select 
+	<include refid="permission_sql" />
+	from permission p
+	where p.groups='nav'
+	</select>
+	
+	<select id="getList" resultMap="permission_map">
+		select 
+		<include refid="permission_sql" />
+		from permission p
+		<where>
+			<if test="bo.id">
+			and p.id=#{bo.id}
+			</if>
+			<if test="bo.name!=null">
+			and p.name like CONCAT('%',#{bo.name},'%')
+			</if>
+			<if test="bo.value!=null">
+			and p.value=#{bo.value}
+			</if>
+	      </where> 
+	      <if test="pager.sort!=null">
+            order by p.${pager.sort} ${pager.order}
+        </if>
+	</select>
+</mapper>

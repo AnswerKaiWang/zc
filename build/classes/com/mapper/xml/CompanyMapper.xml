@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mapper.CompanyMapper" >
+  <resultMap id="company_map" type="Company" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="company_abbr" property="companyAbbr" jdbcType="VARCHAR" />
+    <result column="company_no" property="companyNo" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="company_sql" >
+    id, create_time, update_time, name,company_no,company_abbr 
+  </sql>
+  
+  <select id="getList" resultMap="company_map">
+		select 
+		<include refid="company_sql" />
+		from company 
+		<where>
+			<if test="bo.id!=null">
+			and  id=#{bo.id}
+			</if>
+			<if test="bo.name!=null">
+			and name like CONCAT('%',#{bo.name},'%')
+			</if>
+			<if test="bo.companyNo!=null">
+			and company_no like CONCAT('%',#{bo.companyNo},'%')
+			</if>
+	      </where> 
+	      <if test="pager.sort!=null">
+            order by ${pager.sort} ${pager.order}
+        </if>
+	</select>
+</mapper>

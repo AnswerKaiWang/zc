@@ -1,0 +1,257 @@
+﻿<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+<meta name="renderer" content="webkit" />
+<title>无标题文档</title>
+<link type="text/css" rel="stylesheet" href="http://at.alicdn.com/t/font_1470257308_7612898.css" />
+<link type="text/css" rel="stylesheet" href="${base}/frontCura/style/animate.css" />
+<link type="text/css" rel="stylesheet" href="${base}/frontCura/style/index.css" />
+<script  type="text/javascript" src="${base}/frontCura/js/jquery-1.7.1.js"></script>
+<script  type="text/javascript" src="${base}/frontCura/js/common.js"></script>
+<!--[if lt IE 9]>
+<script src="${base}/frontCura/js/ie/html5.js"></script>
+<script src="${base}/frontCura/js/ie/selectivizr-min.js"></script>
+<![endif]-->
+</head>
+<body>
+<!-- top s -->
+<div class="top">
+  <div class="wrap">
+    <div class="R fr">
+      <ul>
+        <!-- 登陆后 s -->
+       <!--  <li class="user_name">X先生/ 女士，欢迎您！</li>
+        <li class="guwena"><i class="ico ico-kefu"></i>财富顾问</li>
+        <li><a href="#">查看账户</a></li>
+        <li><a href="#">在线客服</a></li>
+        <li><i class="ico ico-iconfontyoujian"></i><a href="${base}/cura/cust/message.htm" class="mail">10</a>封未读通知</li> -->
+        <!-- 登陆后 e-->
+        <!-- 登陆前 s -->
+        <li><a href="javascript:void(0);" id="show_book_popup"><i class="ico ico-shijian"></i>预约财富顾问<i class="ico ico-hot"></i></a></li>
+        <li><a href="#" class="dl">登录</a><a href="#" class="zc">注册</a></li>
+        <!-- 登陆前 e -->
+        <li class="weixina"><i class="ico ico-weixin"></i>关注我们</li>
+        <li><i class="ico ico-phone_1"></i><span class="tel">400-800-1000</span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+<div class="guwenBox"><i class="jiao"></i><i class="ico ico-kefu"></i><em>159333337777</em></div>
+<div class="weixinBox"><i class="jiao"></i><img src="${base}/frontCura/images/cd.jpg" alt="">
+  <p>扫一扫，关注微信公众号</p>
+</div>
+<!-- top e --> 
+<!-- 预约财富顾问弹窗 s -->
+<div class="book_popup">
+  <p class="title">预约财富顾问<span>财富顾问会在下个工作日内与您联系</span></p>
+  <form action="">
+    <ul>
+      <li><i class="ico ico-peoplefill"></i>
+        <input type="text" class="ipt1" placeholder="姓名">
+      </li>
+      <li><i class="ico ico-shouji"></i>
+        <input type="text" class="ipt1" placeholder="手机号">
+      </li>
+      <li>
+        <div id="select_linkage">
+          <select name="prov" class="prov select"  style="width: 143px;">
+          </select>
+          <select name="city" class="city select" style="width: 143px;" >
+          </select>
+        </div>
+		<script type="text/javascript" src="${base}/frontCura/js/cityselect.js"></script>
+        <script type="text/javascript">
+            $(function(){
+                $("#select_linkage").citySelect({
+                    url:'${base}/frontCura/js/city.min.js',
+					prov:null,
+					city:null,
+					dist:null,
+					nodata:"none",
+					required:null
+                });
+            });
+        </script>
+      </li>
+      <li>
+        <div class="pl_w">
+          <input type="text" class="ipt1 yzm" placeholder="输入验证码">
+        </div>
+        <a href="#" class="yzma"><img src="${base}/frontCura/images/yzm.jpg" alt=""></a></li>
+      <li>
+        <input type="submit" class="submit" value="预约服务">
+      </li>
+    </ul>
+  </form>
+</div>
+<!-- 预约财富顾问弹窗 e --> 
+<script type="text/javascript" src="${base}/frontCura/js/placeholder.min.js"></script> 
+<script type="text/javascript">
+//placeholder
+$(document).ready(function(){
+  $('input[placeholder], textarea[placeholder]').each(function(){
+    $(this).is('input')?$(this).iePlaceholder():$(this).iePlaceholder({onInput: false});
+  });
+});
+</script>
+<link type="text/css" rel="stylesheet" href="${base}/frontCura/style/layer.css" />
+<script type="text/javascript" src="${base}/frontCura/js/layer.js"></script> 
+<script type="text/javascript">
+$(function(){
+	$('#show_book_popup').on('click', function(){
+		layer.open({
+		  type: 1,
+		  title: false,
+		  closeBtn:2,
+		  area : ['auto' , 'auto'],
+		  shadeClose :true,
+		  content: $('.book_popup')//弹出预约财富顾问弹窗
+		}); 
+
+	});
+});
+</script>
+<link type="text/css" rel="stylesheet" href="${base}/frontCura/style/select2.min.css" />
+<script src="${base}/frontCura/js/select2.min.js"></script>
+<script type="text/javascript">
+$(function(){
+    $('#select_linkage').find('.select2:first').find('.select2-selection__rendered').text("所在省份")
+    $('#select_linkage').find('.select2:last').find('.select2-selection__rendered').text("所在城市")
+});
+$('.select').select2({
+      theme: "classic",
+       minimumResultsForSearch: Infinity
+});
+</script>
+<!-- header s -->
+<header class="header">
+  <div class="wrap"> <a href="" class="logo"><img src="${base}/frontCura/images/logo.png" alt=""></a>
+    <nav class="nav">
+      <ul>
+        <li><a href="${base}/cura/news.htm" class="active">财智资讯</a></li>
+        <li><a href="javascript:void(0);" onclick="javascript:toProduct('${base}');">基金产品</a></li>
+        <li><a href="#">客户中心</a></li>
+        <li><a href="#">关于我们</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<!-- header e -->
+<!-- banner_link s -->
+<div class="banner_link">
+<img src="images/banner_link.jpg" alt="">
+	<a href="#" class="fl">投资快讯</a><a href="#" class="fr">市场活动</a>
+</div>
+<!-- banner_link e -->
+<!-- main s -->
+<div class="main">
+  <div class="ago_title">
+    <p class="border"></p>
+    <ul class="ul fl">
+      <li class="active"><a href="###">2016<em></em></a></li>
+      <li><a href="###">2015<em></em></a></li>
+      <li><a href="###">2014<em></em></a></li>
+      <li class="more"><a href="###"><i class="ico ico-gengduo"></i><em></em></a></li>
+    </ul>
+    <div class="r_search fr">
+      <form action="">
+        <span class="sld_wrap"><input type="text" name="" class="ipt1" placeholder="请输入您要查询快讯内容"></span>
+        <button type="submit" class="submit"><i class="ico ico-sousuo"></i></button>
+      </form>
+    </div>
+  </div>
+  <!-- news_list s -->
+  <div class="news_list">
+    <dl class="list_item">
+      <dt><a href="#"><img src="${base}/frontCura/images/dly.jpg" width="349" height="224" alt=""></a></dt>
+      <dd>
+        <h3><a href="#">路林新春贺词：勇者无惧，仁者无敌路林新春贺词：勇者无惧，仁者无敌路林新春贺词：勇者无惧，仁者无敌路林新春贺词：勇者无惧，仁者无敌路林新春贺词：勇者无惧，仁者无敌</a></h3>
+        <p class="p1">春节刚过，一股寒潮侵袭了整个中国大地，一夜之间又回到冰雪和严寒，给这个喜庆的节日增添了一丝忧伤。春潮带雨春节刚过，一股寒潮侵袭了整个中国大地，一夜之间又回到冰雪和严寒，给这个喜庆的节日增添了一丝忧伤。春潮带雨春节刚过，一股寒潮侵袭了整个中国大...</p>
+        <p class="p0">2016-06-05</p>
+        <p class="p2"><a href="#" class="more fl">阅读全文&nbsp;&gt;&gt;</a><i class="ico ico-fenxiang fr"></i></p>
+      </dd>
+    </dl>
+    <dl class="list_item">
+      <dt><a href="#"><img src="${base}/frontCura/images/dly.jpg" width="349" height="224" alt=""></a></dt>
+      <dd>
+        <h3><a href="#">路林新春贺词：勇者无惧，仁者无敌</a></h3>
+        <p class="p1">春节刚过，一股寒潮侵袭了整个中国大地，一夜之间又回到冰雪和严寒，给这个喜庆的节日增添了一丝忧伤。春潮带雨春节刚过，一股寒潮侵袭了整个中国大地，一夜之间又回到冰雪和严寒，给这个喜庆的节日增添了一丝忧伤。春潮带雨春节刚过，一股寒潮侵袭了整个中国大...</p>
+        <p class="p0">2016-06-05</p>
+        <p class="p2"><a href="#" class="more fl">阅读全文&nbsp;&gt;&gt;</a><i class="ico ico-fenxiang fr"></i></p>
+      </dd>
+    </dl>
+    <dl class="list_item">
+      <dt><a href="#"><img src="${base}/frontCura/images/dly.jpg" width="349" height="224" alt=""></a></dt>
+      <dd>
+        <h3><a href="#">路林新春贺词：勇者无惧，仁者无敌</a></h3>
+        <p class="p1">春节刚过，一股寒潮侵袭了整个中国大地，一夜之间又回到冰雪和严寒，给这个喜庆的节日增添了一丝忧伤。春潮带雨春节刚过，一股寒潮侵袭了整个中国大地，一夜之间又回到冰雪和严寒，给这个喜庆的节日增添了一丝忧伤。春潮带雨春节刚过，一股寒潮侵袭了整个中国大...</p>
+        <p class="p0">2016-06-05</p>
+        <p class="p2"><a href="#" class="more fl">阅读全文&nbsp;&gt;&gt;</a><i class="ico ico-fenxiang fr"></i></p>
+      </dd>
+    </dl>
+    <dl class="list_item">
+      <dt><a href="#"><img src="${base}/frontCura/images/dly.jpg" width="349" height="224" alt=""></a></dt>
+      <dd>
+        <h3><a href="#">路林新春贺词：勇者无惧，仁者无敌</a></h3>
+        <p class="p1">春节刚过，一股寒潮侵袭了整个中国大地，一夜之间又回到冰雪和严寒，给这个喜庆的节日增添了一丝忧伤。春潮带雨春节刚过，一股寒潮侵袭了整个中国大地，一夜之间又回到冰雪和严寒，给这个喜庆的节日增添了一丝忧伤。春潮带雨春节刚过，一股寒潮侵袭了整个中国大...</p>
+        <p class="p0">2016-06-05</p>
+        <p class="p2"><a href="#" class="more fl">阅读全文&nbsp;&gt;&gt;</a><i class="ico ico-fenxiang fr"></i></p>
+      </dd>
+    </dl>
+    <dl class="list_item">
+      <dt><a href="#"><img src="${base}/frontCura/images/dly.jpg" width="349" height="224" alt=""></a></dt>
+      <dd>
+        <h3><a href="#">路林新春贺词：勇者无惧，仁者无敌</a></h3>
+        <p class="p1">春节刚过，一股寒潮侵袭了整个中国大地，一夜之间又回到冰雪和严寒，给这个喜庆的节日增添了一丝忧伤。春潮带雨春节刚过，一股寒潮侵袭了整个中国大地，一夜之间又回到冰雪和严寒，给这个喜庆的节日增添了一丝忧伤。春潮带雨春节刚过，一股寒潮侵袭了整个中国大...</p>
+        <p class="p0">2016-06-05</p>
+        <p class="p2"><a href="#" class="more fl">阅读全文&nbsp;&gt;&gt;</a><i class="ico ico-fenxiang fr"></i></p>
+      </dd>
+    </dl>
+  </div>
+  <!-- news_list e -->
+  <div class="page_2">
+    <a href="#" title="首页">&lt;&lt;</a>
+    <a href="#" title="上一页">&lt;</a>
+    <a href="#" class="active">1</a>
+    <a href="#">2</a>
+    <a href="#">3</a>
+    <a href="#">4</a>
+    <a href="#">5</a>
+    <a href="#" title="下一页">&gt;</a>
+    <a href="#" title="尾页">&gt;&gt;</a>
+ </div>
+  <dl class="disclaimer">
+    <dt>免责声明</dt>
+    <dd>
+      <p>1、本网站信息均来源于市场公开资料，中城仅基于上述公开资料阐述中城观点，并不保证其准确性、完整性、实时性或正确性。本网站的信息和内容仅供参考，请谨慎使用。</p>
+      <p>2、本网站信息中署名"中城投资"、"中城联合财富"的文章，以及图片和音视频资料，版权均属于中城投资及联合财富中心所有。如需转载请与中城联合财富联系，并在授权的范围内注明来源和作者保证作品的完整性。违反上述声明者，本网站将追究相关法律责任。</p>
+      <p>3、本网站转载其他媒体或机构的作品，并不意味赞同其观点或证实其内容的真实性。如其他媒体、网站或个人从本网下载使用，必须保留本网注明的"来源"，并自负版权等法律责任。</p>
+    </dd>
+  </dl>
+</div>
+<!-- main e -->
+<!-- 分享代码 s -->     
+<div class="bdsharebuttonbox bdsharebuttonbox_style_1"><i class="jiao"></i><a class="aa">分享到：</a><a href="#" class="bds_more" data-cmd="more"></a><a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a><a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a><a href="#" class="bds_tqq" data-cmd="tqq" title="分享到腾讯微博"></a><a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a></div> 
+<script type="text/javascript">
+window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+</script>  
+<!-- 分享代码 e -->
+<!-- 返回顶部 s -->
+<a href="javascript:void(0);" id="back_top"><i class="ico ico-shangjiantou"></i><span>返回顶部</span></a>
+<!-- 返回顶部 e -->
+<!-- footer s -->
+<footer class="footer">
+  <div class="ft_t">
+    <div class="wrap"><a href="">帮助中心</a><a href="">新手指引</a><a href="">中城投资</a></div>
+  </div>
+  <div class="ft_b">
+    <div class="wrap">CopyRight&nbsp;&nbsp;&nbsp;&nbsp;2015~2016 版权所有&nbsp;&nbsp;&nbsp;&nbsp;上海中城联盟财富金融信息服务有限公司&nbsp;&nbsp;&nbsp;&nbsp;沪ICP13017167号 </div>
+  </div>
+</footer>
+<!-- footer e -->
+
+
+</body>
+</html>

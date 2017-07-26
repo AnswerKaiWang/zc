@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mapper.ActivityMapper">
+	<select id="getList" resultType="Activity">
+		SELECT
+		t.id,
+		t.create_time createTime,
+		t.title,
+		t.subhead,
+		t.start_time startTime,
+		t.end_time endTime,
+		t.act_status actStatus  
+		FROM activity t
+		<where>
+		</where>
+		<if test="pager.sort!=null and pager.sort=='create_time'">
+			order by t.${pager.sort} ${pager.order}
+		</if>
+	</select>
+	
+	<delete id="delManagersByActId">
+		DELETE FROM activity_fund_manager WHERE activity_id = #{id}
+	</delete>
+	
+	<delete id="delGuestByActId">
+		DELETE FROM activity_guest WHERE activity_id = #{id}
+	</delete>
+	
+	<delete id="delFileByActId">
+		DELETE FROM activity_file WHERE activity_id = #{id}
+	</delete>
+	
+	<resultMap type="ActivitySaveBo" id="ActivitySaveMap">
+		<id column="id" property="id"/>
+		<result column="title" property="title"/>
+		<result column="subhead" property="subhead"/>
+		<result column="address" property="address"/>
+		<result column="lightspot" property="lightspot"/>
+		<result column="agenda" property="agenda"/>
+		<result column="content" property="content"/>
+		<result column="cover" property="cover"/>
+		<result column="start_time" property="startTime"/>
+		<result column="end_time" property="endTime"/>
+		<result column="type" property="type"/>
+		<result column="max_num" property="maxNum"/>
+		<result column="limit_num" property="limitNum"/>
+		<result column="live_report" property="liveReport"/>
+		<result column="act_status" property="actStatus"/>
+		<result column="ago_title" property="agoTitle"/>
+		<result column="ago_cover" property="agoCover"/>
+		<result column="ago_date" property="agoDate"/>
+		<result column="ago_content" property="agoContent"/>
+		<collection property="managers" ofType="ActivityFundManager" notNullColumn="mid">
+			<id column="mid" property="id"/>
+			<result column="mname" property="name"/>
+			<result column="mavatar" property="avatar"/>
+			<result column="mgender" property="gender"/>
+			<result column="mduty" property="duty"/>
+			<result column="mbrief" property="brief"/>
+		</collection>
+		<collection property="guests" ofType="ActivityGuest" notNullColumn="gid">
+			<id column="gid" property="id"/>
+			<result column="gname" property="name"/>
+			<result column="gavatar" property="avatar"/>
+			<result column="education" property="education"/>
+			<result column="actor" property="actor"/>
+		</collection>
+		<collection property="files" ofType="ActivityFile" notNullColumn="fid">
+			<id column="fid" property="id"/>
+			<result column="fname" property="name"/>
+			<result column="path" property="path"/>
+			<result column="act_file_type" property="actFileType"/>
+			<result column="act_time" property="actTime"/>
+		</collection>
+	</resultMap>
+	<select id="getActivitySaveBo" resultMap="ActivitySaveMap">
+		SELECT 
+		a.id,
+		a.title,
+		a.subhead,
+		a.address,
+		a.lightspot,
+		a.agenda,
+		a.content,
+		a.cover,
+		a.start_time,
+		a.end_time,
+		a.type,
+		a.max_num,
+		a.limit_num,
+		a.live_report,
+		a.ago_title,
+		a.ago_cover,
+		a.ago_date,
+		a.ago_content,
+		a.act_status,
+		afm.id mid,
+		afm.`name` mname,
+		afm.avatar mavatar,
+		afm.gender mgender,
+		afm.duty mduty,
+		afm.brief mbrief,
+		ag.id gid,
+		ag.`name` gname,
+		ag.avatar gavatar,
+		ag.education,
+		ag.actor,
+		af.id fid,
+		af.`name` fname,
+		af.path,
+		af.act_file_type,
+		af.act_time 
+		FROM activity a 
+		LEFT JOIN activity_fund_manager afm ON a.id = afm.activity_id 
+		LEFT JOIN activity_guest ag ON a.id = ag.activity_id 
+		LEFT JOIN activity_file af ON a.id = af.activity_id 
+		WHERE a.id = #{id}
+	</select>
+	
+	<!-- 往期活动列表 -->
+	<resultMap type="ActivityVo" id="ActivityMap">
+		<id column="id" property="id"/>
+		<result column="title" property="title"/>
+		<result column="subhead" property="subhead"/>
+		<result column="address" property="address"/>
+		<result column="content" property="content"/>
+		<result column="cover" property="cover"/>
+		<result column="start_time" property="startTime"/>
+		<result column="end_time" property="endTime"/>
+		<result column="type" property="type"/>
+		<result column="max_num" property="maxNum"/>
+		<result column="live_report" property="liveReport"/>
+		<collection property="managers" ofType="ActivityFundManager" notNullColumn="mid">
+			<id column="mid" property="id"/>
+			<result column="mname" property="name"/>
+			<result column="mavatar" property="avatar"/>
+			<result column="mgender" property="gender"/>
+			<result column="mduty" property="duty"/>
+			<result column="mbrief" property="brief"/>
+		</collection>
+	</resultMap>
+	<select id="curaList" resultMap="ActivityMap">
+		SELECT 
+		a.id,
+		a.title,
+		a.subhead,
+		a.address,
+		a.content,
+		a.cover,
+		a.start_time,
+		a.end_time,
+		a.type,
+		a.max_num,
+		a.limit_num,
+		afm.id mid,
+		afm.`name` mname,
+		afm.avatar mavatar,
+		afm.gender mgender,
+		afm.duty mduty,
+		afm.brief mbrief
+		FROM activity a 
+		LEFT JOIN activity_fund_manager afm ON a.id = afm.activity_id 
+		WHERE a.act_status = 2 
+		<if test="mf == 0 ">
+			AND DATE_FORMAT(a.create_time,'%Y') = #{year} 
+		</if>
+		<if test="mf == 1">
+			AND DATE_FORMAT(a.create_time,'%Y') &lt;= #{year} 
+		</if>
+		<if test="keyword != null">
+			AND ( a.title like concat('%',#{keyword},'%') OR a.subhead like concat('%',#{keyword},'%'))
+		</if>
+		ORDER BY a.create_time DESC 
+		LIMIT #{start},#{pageSize}
+	</select>
+	
+	<select id="curaCount" resultType="int">
+		SELECT 
+		count(1) 
+		FROM activity a 
+		LEFT JOIN activity_fund_manager afm ON a.id = afm.activity_id 
+		WHERE a.act_status = 2 
+		<if test="mf == 0 ">
+			AND DATE_FORMAT(a.create_time,'%Y') = #{year} 
+		</if>
+		<if test="mf == 1">
+			AND DATE_FORMAT(a.create_time,'%Y') &lt;= #{year} 
+		</if>
+		<if test="keyword != null">
+			AND ( a.title like concat('%',#{keyword},'%') OR a.subhead like concat('%',#{keyword},'%'))
+		</if>
+	</select>
+	
+	<select id="curaNowList" resultMap="ActivityMap">
+		SELECT 
+		a.id,
+		a.title,
+		a.subhead,
+		a.address,
+		a.content,
+		a.cover,
+		a.start_time,
+		a.end_time,
+		a.type,
+		a.max_num,
+		a.limit_num,
+		afm.id mid,
+		afm.`name` mname,
+		afm.avatar mavatar,
+		afm.gender mgender,
+		afm.duty mduty,
+		afm.brief mbrief
+		FROM activity a 
+		LEFT JOIN activity_fund_manager afm ON a.id = afm.activity_id 
+		WHERE a.act_status = 1
+		ORDER BY a.create_time DESC 
+	</select>
+	<resultMap type="ActivityWebDetailVo" id="ActivityWebDetailVoMap">
+		<id column="id" property="id"/>
+		<result column="title" property="title"/>
+		<result column="subhead" property="subhead"/>
+		<result column="lightspot" property="lightspot"/>
+		<result column="agenda" property="agenda"/>
+		<result column="content" property="content"/>
+		<result column="live_report" property="liveReport"/>
+		<result column="act_status" property="actStatus"/>
+		<result column="ago_title" property="agoTitle"/>
+		<result column="ago_cover" property="agoCover"/>
+		<result column="ago_date" property="agoDate"/>
+		<result column="ago_content" property="agoContent"/>
+		<collection property="guests" ofType="ActivityGuest" notNullColumn="gid">
+			<id column="gid" property="id"/>
+			<result column="gname" property="name"/>
+			<result column="gavatar" property="avatar"/>
+			<result column="education" property="education"/>
+			<result column="actor" property="actor"/>
+		</collection>
+		<collection property="files" ofType="ActivityFile" notNullColumn="fid">
+			<id column="fid" property="id"/>
+			<result column="fname" property="name"/>
+			<result column="path" property="path"/>
+			<result column="act_file_type" property="actFileType"/>
+			<result column="act_time" property="actTime"/>
+		</collection>
+	</resultMap>
+	<select id="curaDetailById" resultMap="ActivityWebDetailVoMap">
+		SELECT 
+		a.id,
+		a.title,
+		a.subhead,
+		a.lightspot,
+		a.agenda,
+		a.content,
+		a.live_report,
+		a.act_status,
+		a.ago_title,
+		a.ago_cover,
+		a.ago_date,
+		a.ago_content,
+		ag.id gid,
+		ag.`name` gname,
+		ag.avatar gavatar,
+		ag.education,
+		ag.actor,
+		af.id fid,
+		af.`name` fname,
+		af.path,
+		af.act_file_type,
+		af.act_time 
+		FROM activity a 
+		LEFT JOIN activity_guest ag ON a.id = ag.activity_id 
+		LEFT JOIN activity_file af ON a.id = af.activity_id 
+		WHERE a.id = #{id}
+	</select>
+</mapper>

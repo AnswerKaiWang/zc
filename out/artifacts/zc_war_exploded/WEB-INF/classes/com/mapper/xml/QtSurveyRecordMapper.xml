@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mapper.QtSurveyRecordMapper" >
+	<!-- 问卷调查 -->
+   <select id="getList" resultType="QtSurveyRecordVo">
+		select 
+		qr.id,
+		qr.user_second_id userSecondId,
+		us.name,
+		qr.qs_id qsId,
+		qr.qst_id qstId,
+		qr.qsa_id qsaId,
+		qr.score,
+		qr.create_time createTime  
+		from qt_survey_record qr 
+		INNER JOIN user_second us ON qr.user_second_id = us.id 
+	      <if test="pager.sort!=null">
+            order by qr.${pager.sort} ${pager.order}
+        </if>
+	</select>
+	
+</mapper>
